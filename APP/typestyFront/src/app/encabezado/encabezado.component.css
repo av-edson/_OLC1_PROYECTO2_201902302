@@ -1,0 +1,38 @@
+*{
+    margin: 0;
+	padding: 0;
+	list-style: none;
+
+}
+div{
+    width: 850px;
+    position: relative;
+	margin: auto;
+	margin-top: 20px;
+    padding: 5px;
+}
+
+ul{
+    width: 870px;
+	height: 60px;
+	background-color: #000;
+	position: relative;
+	margin: auto;
+}
+
+ul li{
+    float: left;
+    margin: 0;
+    font-size: larger;
+    margin-right: 7px;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+ul li a{
+    padding: .3em;
+  display: block;
+  text-decoration: none;
+  color: #000;
+  background: #9c56ec;
+}
