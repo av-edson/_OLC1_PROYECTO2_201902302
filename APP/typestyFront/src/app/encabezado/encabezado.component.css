@@ -4,11 +4,17 @@
 	list-style: none;
 
 }
+.banner h1{
+    text-align: center;
+    text-shadow: black;
+    font-family: fantasy;
+    background-color: hotpink;
+}
 div{
     width: 850px;
     position: relative;
 	margin: auto;
-	margin-top: 20px;
+	margin-top: 10px;
     padding: 5px;
 }
 
@@ -33,6 +39,21 @@ ul li a{
     padding: .3em;
   display: block;
   text-decoration: none;
-  color: #000;
-  background: #9c56ec;
+  color:#FFF;
+  font-family: 'Times New Roman', Times, serif;
 }
+
+.arcoiris {
+   background-color: rgb(6, 97, 97);
+  background-image: -webkit-linear-gradient(45deg, #f1c40f 50%, transparent 50%);
+  background-image: linear-gradient(45deg, #f1c40f 50%, transparent 50%);
+  background-position: 100%;
+  background-size: 400%;
+  -webkit-transition: background 300ms ease-in-out;
+  transition: background 300ms ease-in-out;
+  }
+
+  .arcoiris:hover{
+    background-position: 0;
+    font-size: 105%;
+  }

@@ -3,14 +3,29 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { EncabezadoComponent } from './encabezado/encabezado.component';
+import { ConsolaComponent } from './components/consola/consola.component';
+import { TablaSimbolosComponent } from './components/tabla-simbolos/tabla-simbolos.component';
+import { TablaErroresComponent } from './components/tabla-errores/tabla-errores.component';
+import { PestanaComponent } from './components/pestana/pestana.component';
+import { EditorComponent } from './components/editor/editor.component';
+
+import { FormsModule } from '@angular/forms';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 @NgModule({
   declarations: [
     AppComponent,
-    EncabezadoComponent
+    EncabezadoComponent,
+    ConsolaComponent,
+    TablaSimbolosComponent,
+    TablaErroresComponent,
+    PestanaComponent,
+    EditorComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    FormsModule,
+    CodemirrorModule
   ],
   providers: [],
   bootstrap: [AppComponent]

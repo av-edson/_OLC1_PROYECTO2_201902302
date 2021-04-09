@@ -1,0 +1,11 @@
+article{
+    margin-top: 50px;
+}
+.editor{
+    float: left;
+    margin-left: 150px;
+}
+.consola{
+    float: right;
+    margin-right: 150px;
+}
