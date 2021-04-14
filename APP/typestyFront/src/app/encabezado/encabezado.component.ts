@@ -3,6 +3,7 @@ import { EditorService } from '../services/editor.service';
 import { VistasService } from '../services/vistas.service';
 import {VentanaService} from '../services/ventana.service';
 import {codeModel} from '../models/code-model'
+import { ReadFile, ReadMode } from 'ngx-file-helpers';
 
 @Component({
   selector: 'app-encabezado',
@@ -14,12 +15,16 @@ export class EncabezadoComponent implements OnInit {
   creditos: string;
   auxiliar: codeModel;
   indiceVentana:number;
+  
+  public modoLectura = ReadMode.text;
+  public archivoSeleccionado: ReadFile | null = null;
 
   constructor(private dataServise:EditorService,public dataService2:VistasService,public dataService3:VentanaService) {
     this.titulo = 'Bienvenido a TYPESTY ';
     this.auxiliar = {numeroVista:0,code:'asdf'};
     this.creditos = 'Created by Edson Avila @av_edson'
     this.indiceVentana = 0;
+    
     // ------------------------
     this.auxiliar = {numeroVista:this.dataService2.lista.getSize(), code:this.dataServise.contenidoEditor}
     this.dataService3.listaVentanas.push(this.auxiliar)
@@ -51,5 +56,21 @@ export class EncabezadoComponent implements OnInit {
 
   cambiar(index:number){
     this.dataService3.ventanaActual = index;
+  }
+
+  onFilePicked(file: ReadFile) {
+    this.archivoSeleccionado = file;
+    console.log(file.name)
+    console.log(file.content)
+    this.dataService3.listaVentanas[this.dataService3.ventanaActual].code = file.content
+  }
+
+  filtroArchivo(file:File):boolean{
+    if (file.name.match('.txt')) {
+      return true
+    }else{
+      alert('El Archivo ingresado no es de extensión .y')
+      return false
+    }
   }
 }

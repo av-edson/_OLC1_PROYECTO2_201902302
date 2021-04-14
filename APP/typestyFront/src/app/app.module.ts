@@ -9,11 +9,13 @@ import { TablaSimbolosComponent } from './components/tabla-simbolos/tabla-simbol
 import { TablaErroresComponent } from './components/tabla-errores/tabla-errores.component';
 import { PestanaComponent } from './components/pestana/pestana.component';
 import { EditorComponent } from './components/editor/editor.component';
-
+// para rutear
 import { FormsModule,ReactiveFormsModule  } from '@angular/forms';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { HomeComponent } from './components/home/home.component';
-
+// file chooser
+import { NgxFileHelpersModule } from 'ngx-file-helpers';
+// para comunicacion con back
 import { HttpClientModule } from '@angular/common/http';
 
 
@@ -35,6 +37,7 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
+    NgxFileHelpersModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

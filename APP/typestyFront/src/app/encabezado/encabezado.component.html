@@ -4,6 +4,8 @@
 
 <div class="menu">
     <ul>
+        <li><button class="arcoiris" mat-button #filePicker="ngxFilePicker" ngxFilePicker [readMode]="modoLectura" 
+             (filePick)="onFilePicked($event)" [filter]="filtroArchivo">Abrir        </button>
         <li><button class="arcoiris">Guardar        </button>
         <li><button class="arcoiris" (click)="nueva()">Nueva Pestaña  </button></li>
         <li><button class="arcoiris" (click)="cerrar()">Cerrar Pestaña </button></li>
