@@ -10,9 +10,11 @@ import { TablaErroresComponent } from './components/tabla-errores/tabla-errores.
 import { PestanaComponent } from './components/pestana/pestana.component';
 import { EditorComponent } from './components/editor/editor.component';
 
-import { FormsModule } from '@angular/forms';
+import { FormsModule,ReactiveFormsModule  } from '@angular/forms';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { HomeComponent } from './components/home/home.component';
+
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -31,6 +33,8 @@ import { HomeComponent } from './components/home/home.component';
     FormsModule,
     CodemirrorModule,
     AppRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

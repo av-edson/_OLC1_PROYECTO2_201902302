@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import {VentanaService} from '../../services/ventana.service';
+import {CompilarService} from '../../services/compilar.service'
+import {codeModel} from '../../models/code-model'
 
 @Component({
   selector: 'app-pestana',
@@ -9,7 +11,12 @@ import {VentanaService} from '../../services/ventana.service';
 })
 export class PestanaComponent implements OnInit {
 
-  constructor(private rutaActiva: ActivatedRoute,public dataService:VentanaService) { 
+  private temporal:codeModel;
+  constructor(private rutaActiva: ActivatedRoute,public dataService:VentanaService,private compi:CompilarService) { 
+    this.temporal={
+      numeroVista: 0,
+    code: '',
+    }
   }
   
   ngOnInit(): void {
@@ -19,7 +26,14 @@ export class PestanaComponent implements OnInit {
   
 
   compilar(contenido:string){
-    window.alert(contenido);
+    this.temporal.code = contenido;
+    this.compi.compilarContenido(this.temporal).subscribe(
+      (res) => {  
+        console.log(res);
+      },
+      (err) => console.error(err)
+    );
+    //window.alert(contenido);
   }
 
 }
