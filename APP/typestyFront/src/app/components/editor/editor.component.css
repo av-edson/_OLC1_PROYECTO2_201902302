@@ -3,3 +3,26 @@
     margin: auto;
     width: 600px;
 }
+
+.arcoiris {
+    margin-top: 3px;
+    margin-right: 80px;
+    width: 120px;
+    height: 30px;
+    font-size: medium;
+    background-color: rgb(6, 97, 97);
+   background-image: -webkit-linear-gradient(45deg, #f1c40f 50%, transparent 50%);
+   background-image: linear-gradient(45deg, #f1c40f 50%, transparent 50%);
+   background-position: 100%;
+   background-size: 400%;
+   -webkit-transition: background 300ms ease-in-out;
+   transition: background 300ms ease-in-out;
+   color: aliceblue;
+   }
+ 
+   .arcoiris:hover{
+     background-position: 0;
+   }
+   .botones{
+     display: block;
+   }

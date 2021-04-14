@@ -1,10 +1,17 @@
 <div class="editor">
-    <ngx-codemirror
-  [(ngModel)]="content"
+    <ngx-codemirror #codeeditor
+    [(ngModel)]="content"
+    (ngModelChange)="setEditorContent()"
   [options]="{
     lineNumbers: true,
     theme: 'icecoder',
     mode: 'javascript'
   }"
 ></ngx-codemirror>
+<div class="botones">
+<button class="arcoiris" type="submit" (click)="compile_method()">Compilar</button>
+<button class="arcoiris" id="limpiar" type="submit" (click)="cleanEditor()">Limpiar</button>
+<button class="arcoiris" id="limpiar" type="submit" (click)="actualizar()">Actualizar</button>
 </div>
+</div>
+

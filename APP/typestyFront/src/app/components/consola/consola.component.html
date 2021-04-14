@@ -1,8 +1,9 @@
 <div class="contenedor">
     <ngx-codemirror
+    [(ngModel)]="content"
   [options]="{
     lineNumbers: true,
-    theme: 'icecoder',
+    theme: 'material',
     mode: 'javascript'
   }"
 ></ngx-codemirror>

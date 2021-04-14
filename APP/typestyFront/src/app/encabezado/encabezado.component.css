@@ -18,29 +18,51 @@ div{
     padding: 5px;
 }
 
-ul{
+.menu ul{
     width: 870px;
 	height: 60px;
 	background-color: #000;
 	position: relative;
 	margin: auto;
 }
+.menu2 .ul2{
+    width: 860px;
+	min-height: 80px;
+	background-color: #000;
+	position: relative;
+	margin: 5px;
+}
 
-ul li{
+.menu ul li{
     float: left;
     margin: 0;
-    font-size: larger;
+    font-size:22px;
     margin-right: 7px;
-    margin-left: 20px;
+    margin-left: 40px;
     margin-top: 10px;
 }
 
-ul li a{
+.menu2 .ul2 li{
+    float: left;
+    margin: 0;
+    font-size:22px;
+    margin: 5px;
+}
+
+a{
+    color: white;
+    text-decoration: none;
+}
+
+.menu ul li button{
+    width: 110px;
+    height: 40px;
     padding: .3em;
   display: block;
   text-decoration: none;
   color:#FFF;
   font-family: 'Times New Roman', Times, serif;
+  border-style: none;
 }
 
 .arcoiris {
@@ -53,7 +75,26 @@ ul li a{
   transition: background 300ms ease-in-out;
   }
 
+  .arcoiris2 {
+    background-color: rgb(6, 97, 97);
+   background-image: -webkit-linear-gradient(45deg, #f1c40f 50%, transparent 50%);
+   background-image: linear-gradient(45deg, #f1c40f 50%, transparent 50%);
+   background-position: 100%;
+   background-size: 400%;
+   -webkit-transition: background 300ms ease-in-out;
+   transition: background 300ms ease-in-out;
+   }
+   .arcoiris2:hover{
+    background-color: rgb(6, 97, 97);
+    background-image: -webkit-linear-gradient(45deg, #f1c40f 50%, transparent 50%);
+    background-image: linear-gradient(45deg, #f1c40f 50%, transparent 50%);
+    background-position: 100%;
+   background-size: 400%;
+   -webkit-transition: background 300ms ease-in-out;
+   transition: background 300ms ease-in-out;
+  }
+
   .arcoiris:hover{
     background-position: 0;
-    font-size: 105%;
+    font-size: 70%;
   }

@@ -1,8 +1,10 @@
+<h1> Ventana No{{this.dataService.ventanaActual}}</h1>
 <article>
     <div class="consola">
         <app-consola></app-consola>
     </div>
     <div class="editor">
-        <app-editor></app-editor>
+        <app-editor 
+                (regresarContenido) = "compilar($event)"></app-editor>
     </div>
 </article>

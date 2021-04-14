@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, Input, OnInit, Output } from '@angular/core';
+import { EventEmitter } from '@angular/core';
+import {EditorService} from '../../services/editor.service'
+import {VentanaService} from '../../services/ventana.service'
 import 'codemirror/mode/javascript/javascript';
 
 @Component({
@@ -9,22 +11,37 @@ import 'codemirror/mode/javascript/javascript';
 })
 export class EditorComponent implements OnInit {
 
+  @Output() regresarContenido = new EventEmitter<string>();
+
   content:string;
-  constructor() {
-    this.content = 'function findSequence(goal) {\n function find(start, history) {'
-    this.content+= '    if (start == goal)\n'
-    this.content+= '      return history;\n'
-    this.content+= '    else if (start > goal)\n'
-    this.content+= '      return null;\n'
-    this.content+= '    else\n'
-    this.content+= '      return find(start + 5, "(" + history + " + 5)") ||\n'
-    this.content+= '             find(start * 3, "(" + history + " * 3)");\n'
-    this.content+= '  }\n'
-    this.content+= '  return find(1, "1");\n'
-    this.content+= '}\n'
+
+  constructor(public  dataService:EditorService, public dataService2:VentanaService) {
+    this.content='';
    }
 
   ngOnInit(): void {
+    this.content = this.dataService2.listaVentanas[this.dataService2.ventanaActual].code;
   }
 
+  compile_method(){
+    this.dataService.contenidoEditor = this.content;
+    this.regresarContenido.emit(this.content);
+  }
+
+  cleanEditor(){
+    this.dataService.contenidoEditor = ""
+    this.content = this.dataService.contenidoEditor
+    this.dataService2.listaVentanas[this.dataService2.ventanaActual].code=''
+  }
+  setEditorContent(){
+    this.dataService2.listaVentanas[this.dataService2.ventanaActual].code = this.content;
+  }
+
+  guardar(){
+    this.dataService2.listaVentanas[this.dataService2.ventanaActual].code = this.content;
+  }
+
+  actualizar(){
+    this.content = this.dataService2.listaVentanas[this.dataService2.ventanaActual].code;
+  }
 }

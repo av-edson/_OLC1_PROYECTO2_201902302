@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-consola',
@@ -7,7 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ConsolaComponent implements OnInit {
 
-  constructor() { }
+  content:String;
+  numeroVentana:number;
+  constructor(private rutaActiva: ActivatedRoute) { 
+    this.content=""
+    this.numeroVentana=this.rutaActiva.snapshot.params.id;
+  }
 
   ngOnInit(): void {
   }

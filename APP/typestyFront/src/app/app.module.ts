@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { AppRoutingModule } from './app-routing.module'
 
 import { AppComponent } from './app.component';
 import { EncabezadoComponent } from './encabezado/encabezado.component';
@@ -11,6 +12,8 @@ import { EditorComponent } from './components/editor/editor.component';
 
 import { FormsModule } from '@angular/forms';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { HomeComponent } from './components/home/home.component';
+
 
 @NgModule({
   declarations: [
@@ -20,12 +23,14 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
     TablaSimbolosComponent,
     TablaErroresComponent,
     PestanaComponent,
-    EditorComponent
+    EditorComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    CodemirrorModule
+    CodemirrorModule,
+    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
