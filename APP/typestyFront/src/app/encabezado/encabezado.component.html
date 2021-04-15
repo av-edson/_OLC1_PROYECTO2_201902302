@@ -6,7 +6,7 @@
     <ul>
         <li><button class="arcoiris" mat-button #filePicker="ngxFilePicker" ngxFilePicker [readMode]="modoLectura" 
              (filePick)="onFilePicked($event)" [filter]="filtroArchivo">Abrir        </button>
-        <li><button class="arcoiris">Guardar        </button>
+        <li><button class="arcoiris" (click)="Guardar()">Guardar        </button>
         <li><button class="arcoiris" (click)="nueva()">Nueva Pestaña  </button></li>
         <li><button class="arcoiris" (click)="cerrar()">Cerrar Pestaña </button></li>
         <li><button class="arcoiris">Reporte AST    </button></li>
@@ -19,3 +19,4 @@
             <button button class="arcoiris2"(click)="cambiar(ventana.numeroVista)" ><a routerLink="/home/{{ventana.numeroVista}}">ventana: {{ventana.numeroVista}}</a></button></li>
     </ul>
 </div>
+

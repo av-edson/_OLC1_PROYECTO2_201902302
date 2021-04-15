@@ -15,6 +15,8 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { HomeComponent } from './components/home/home.component';
 // file chooser
 import { NgxFileHelpersModule } from 'ngx-file-helpers';
+// file saver
+
 // para comunicacion con back
 import { HttpClientModule } from '@angular/common/http';
 
@@ -28,7 +30,7 @@ import { HttpClientModule } from '@angular/common/http';
     TablaErroresComponent,
     PestanaComponent,
     EditorComponent,
-    HomeComponent
+    HomeComponent,
   ],
   imports: [
     BrowserModule,

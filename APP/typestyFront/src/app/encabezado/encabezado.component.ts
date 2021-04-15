@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { EditorService } from '../services/editor.service';
 import { VistasService } from '../services/vistas.service';
 import {VentanaService} from '../services/ventana.service';
+import {GuardarArchivoService} from '../services/guardar-archivo.service'
 import {codeModel} from '../models/code-model'
 import { ReadFile, ReadMode } from 'ngx-file-helpers';
 
@@ -19,7 +20,8 @@ export class EncabezadoComponent implements OnInit {
   public modoLectura = ReadMode.text;
   public archivoSeleccionado: ReadFile | null = null;
 
-  constructor(private dataServise:EditorService,public dataService2:VistasService,public dataService3:VentanaService) {
+  constructor(private dataServise:EditorService,public dataService2:VistasService,public dataService3:VentanaService,
+    public save:GuardarArchivoService) {
     this.titulo = 'Bienvenido a TYPESTY ';
     this.auxiliar = {numeroVista:0,code:'asdf'};
     this.creditos = 'Created by Edson Avila @av_edson'
@@ -66,11 +68,16 @@ export class EncabezadoComponent implements OnInit {
   }
 
   filtroArchivo(file:File):boolean{
-    if (file.name.match('.txt')) {
+    if (file.name.match('.ty')) {
       return true
     }else{
       alert('El Archivo ingresado no es de extensión .y')
       return false
     }
+  }
+
+  Guardar(){
+    console.log(this.dataService3.listaVentanas[this.dataService3.ventanaActual].code)
+    this.save.saveFile(this.dataService3.listaVentanas[this.dataService3.ventanaActual].code);
   }
 }
