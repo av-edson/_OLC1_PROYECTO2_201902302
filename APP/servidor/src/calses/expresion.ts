@@ -17,7 +17,7 @@ export class expresion implements instruccion{
         this.tipo=tipo;
         this.noFila=fila;
         this.noColumna=columna;
-        this.simbol = new simbolo(tipoDato,valor);
+        this.simbol = new simbolo(tipoDato,valor?.toString().toLowerCase());
     }
 
 
@@ -137,7 +137,8 @@ export class expresion implements instruccion{
                     return new simbolo(tipoDatos.booleano,"true")
                 }
                 break;
-            default:
+            case 4:
+                
                 break;
         }
         return new simbolo(tipoDatos.error,null);

@@ -9,7 +9,7 @@ class expresion {
         this.tipo = tipo;
         this.noFila = fila;
         this.noColumna = columna;
-        this.simbol = new simbolos_1.simbolo(tipoDato, valor);
+        this.simbol = new simbolos_1.simbolo(tipoDato, valor === null || valor === void 0 ? void 0 : valor.toString().toLowerCase());
     }
     ejecutar() {
         var simboloDerecho = new simbolos_1.simbolo(null, null);
@@ -129,7 +129,7 @@ class expresion {
                     return new simbolos_1.simbolo(simbolos_1.tipoDatos.booleano, "true");
                 }
                 break;
-            default:
+            case 4:
                 break;
         }
         return new simbolos_1.simbolo(simbolos_1.tipoDatos.error, null);

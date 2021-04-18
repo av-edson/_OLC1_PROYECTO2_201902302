@@ -14,13 +14,15 @@ var numeroLinea = 1;
 %%
 /*comentarios*/
 ("/"{2,})([^\n])*\n {console.log(yytext);}
-("/""*")[^"*/"]*("*/") {console.log(yytext);}
+//("/""*")([^\n\r]|\n)*("*/") {console.log(yytext);}
+"/""*"(([^\n\r]|\n)*)("*""/") {console.log(yytext);}
 /* tipos de datos */
 "exec"          return 'func_exec';
 "int"           return 'def_entero';
 "double"        return 'def_decimal';
 "char"          return 'def_caracter';
 "string"        return 'def_cadena';
+"boolean"       return 'def_boolean';
 /* secuencias de escape */
 \\n             return 'esc_salto_linea';
 \\             return 'esc_barra_invertida';
@@ -94,14 +96,15 @@ INSTRUCCIONES: INSTRUCCIONES INSTRUCCION
 
 BLOQUE_SENTENCIAS: llave_abre INSTRUCCIONES llave_cierra;
 
-INSTRUCCION: DECLARACION
-            |ASIGNACION
+INSTRUCCION: ASIGNACION
+            |DECLARACION{controllador.Grammar.consola +=$$.printInfo()+"\n";}
             |LLAMADA_FUNCION
             |SENTENCIA_CONTROL ;
 
-DECLARACION: TIPO_DATO identificador punto_coma{controllador.Grammar.consola += $2 +" vale\n"};
+DECLARACION: TIPO_DATO identificador punto_coma{$$ = new S.simbolo($1.getTipoDato(),$1.getValor());};
 
-ASIGNACION: identificador op_igual EXPRESION punto_coma{controllador.Grammar.consola += $3.getNombreSimbolo() +" vale: "+ $3.simbol.getValor()+"\n"};
+ASIGNACION: identificador op_igual EXPRESION punto_coma{controllador.Grammar.consola += $3.getNombreSimbolo() +" vale: "+ $3.simbol.getValor()+"\n"}
+        |TIPO_DATO identificador op_igual EXPRESION punto_coma{controllador.Grammar.consola += $4.getNombreSimbolo() +" vale: "+ $4.simbol.getValor()+"\n"};
 
 EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExpresion.multiplicacion,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
             |EXPRESION suma EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.suma,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
@@ -121,7 +124,8 @@ DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLin
         |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1));}
         |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1));};
 
-TIPO_DATO: def_entero {}
-            |def_decimal
-            |def_caracter
-            |def_cadena;
+TIPO_DATO: def_entero {$$ = new S.simbolo(S.tipoDatos.entero,null);}
+            |def_decimal{$$ = new S.simbolo(S.tipoDatos.decimal,null);}
+            |def_caracter{$$ = new S.simbolo(S.tipoDatos.caracter,null);}
+            |def_cadena{$$ = new S.simbolo(S.tipoDatos.cadena,null);}
+            |def_boolean{$$ = new S.simbolo(S.tipoDatos.booleano,null);};

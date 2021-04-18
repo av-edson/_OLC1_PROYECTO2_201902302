@@ -3,12 +3,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.tipoDatos = exports.simbolo = void 0;
 class simbolo {
     constructor(tipoDato, valor) {
+        if (valor == null) {
+            switch (tipoDato) {
+                case tipoDatos.entero:
+                    this.valor = "0";
+                    break;
+                case tipoDatos.decimal:
+                    this.valor = "0.0";
+                    break;
+                case tipoDatos.cadena:
+                    this.valor = "";
+                    break;
+                case tipoDatos.caracter:
+                    this.valor = '\u0000';
+                    break;
+                case tipoDatos.booleano:
+                    this.valor = "true";
+                    break;
+            }
+        }
+        else {
+            this.valor = valor;
+        }
         this.tipo = tipoDato;
-        this.valor = valor;
         this.tieneReturn = false;
     }
     getValor() {
         return String(this.valor);
+    }
+    getTipoDato() {
+        return this.tipo;
+    }
+    printInfo() {
+        var contenido = "tipo: " + this.getTipoDato() + " valor: " + this.getValor();
+        return contenido;
     }
 }
 exports.simbolo = simbolo;
