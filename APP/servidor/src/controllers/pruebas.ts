@@ -12,4 +12,5 @@ export const compilar = (req:Request, res:Response) => {
     res.json({
         mensaje: 'Gerardo Hueco compilado'
     })
+
 }

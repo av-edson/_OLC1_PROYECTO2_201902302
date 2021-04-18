@@ -11,11 +11,14 @@ import {codeModel} from '../../models/code-model'
 })
 export class PestanaComponent implements OnInit {
 
+  private regresoCompilador: any = [];
   private temporal:codeModel;
-  constructor(private rutaActiva: ActivatedRoute,public dataService:VentanaService,private compi:CompilarService) { 
+  regresoConsosla:string=''
+  constructor(public dataService:VentanaService,private compi:CompilarService) { 
     this.temporal={
       numeroVista: 0,
     code: '',
+    console:''
     }
   }
   
@@ -29,11 +32,20 @@ export class PestanaComponent implements OnInit {
     this.temporal.code = contenido;
     this.compi.compilarContenido(this.temporal).subscribe(
       (res) => {  
-        console.log(res);
+        this.regresoCompilador = res;
+        //console.log(this.regresoCompilador.mensaje)
+        this.otro(this.regresoCompilador.mensaje)
       },
       (err) => console.error(err)
     );
     //window.alert(contenido);
+    //this.dataService.listaVentanas[this.dataService.ventanaActual].console = this.regresoCompilador.mensaje;
   }
 
+  otro(conntenido:string){
+    this.dataService.listaVentanas[this.dataService.ventanaActual].console = conntenido;
+    console.log(this.dataService.listaVentanas[this.dataService.ventanaActual].console);
+    this.regresoConsosla = this.dataService.listaVentanas[this.dataService.ventanaActual].console;
+    alert('Compilacion Exiitosa')
+  }
 }

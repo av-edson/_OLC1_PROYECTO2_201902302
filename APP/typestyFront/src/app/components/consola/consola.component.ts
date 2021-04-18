@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import {VentanaService} from '../../services/ventana.service';
 
 @Component({
   selector: 'app-consola',
@@ -8,14 +9,16 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ConsolaComponent implements OnInit {
 
-  content:String;
+  @Input() contenidoConsola:string='';
   numeroVentana:number;
-  constructor(private rutaActiva: ActivatedRoute) { 
-    this.content=""
+  constructor(private rutaActiva: ActivatedRoute, private servicioConsola:VentanaService) { 
     this.numeroVentana=this.rutaActiva.snapshot.params.id;
   }
 
   ngOnInit(): void {
   }
 
+  actualizar(){
+    this.contenidoConsola = this.servicioConsola.listaVentanas[this.servicioConsola.ventanaActual].console;
+  }
 }

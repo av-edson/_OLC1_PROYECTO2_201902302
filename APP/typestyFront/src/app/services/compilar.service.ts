@@ -12,7 +12,7 @@ export class CompilarService {
   constructor(private http: HttpClient) {  }
 
   compilarContenido(contenido:codeModel) {
-    console.log(contenido)
+    //console.log(contenido)
     return this.http.post('http://localhost:3000/compilar',contenido);
   }
 }

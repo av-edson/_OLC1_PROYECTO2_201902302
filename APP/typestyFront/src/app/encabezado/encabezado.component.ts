@@ -23,12 +23,12 @@ export class EncabezadoComponent implements OnInit {
   constructor(private dataServise:EditorService,public dataService2:VistasService,public dataService3:VentanaService,
     public save:GuardarArchivoService) {
     this.titulo = 'Bienvenido a TYPESTY ';
-    this.auxiliar = {numeroVista:0,code:'asdf'};
     this.creditos = 'Created by Edson Avila @av_edson'
     this.indiceVentana = 0;
     
     // ------------------------
-    this.auxiliar = {numeroVista:this.dataService2.lista.getSize(), code:this.dataServise.contenidoEditor}
+    this.auxiliar = {numeroVista:this.dataService2.lista.getSize(), code:this.dataServise.contenidoEditor, 
+    console:''}
     this.dataService3.listaVentanas.push(this.auxiliar)
     this.dataService2.lista.append(this.dataService2.lista.getSize());
    }
@@ -43,7 +43,7 @@ export class EncabezadoComponent implements OnInit {
       this.dataService3.listaVentanas[this.indiceVentana].code = this.dataServise.contenidoEditor;
       this.indiceVentana++;
 
-      this.auxiliar = {numeroVista:this.dataService2.lista.getSize(), code:''}
+      this.auxiliar = {numeroVista:this.dataService2.lista.getSize(), code:'',console:''}
       this.dataService3.listaVentanas.push(this.auxiliar)
 
       this.dataService2.lista.append(this.dataService2.lista.getSize());

@@ -1,12 +1,12 @@
 .contenedor{
     position: relative;
 	margin: auto;
-    width: 500px;
+    width: 546px;
     min-height: 400px;
 }
 .consola{
     background-color: black;
-    min-width: 500px;
+    min-width: 560px;
     min-height: 300px;
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;

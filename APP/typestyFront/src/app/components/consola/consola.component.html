@@ -1,10 +1,11 @@
 <div class="contenedor">
     <ngx-codemirror
-    [(ngModel)]="content"
+    [(ngModel)]="contenidoConsola"
   [options]="{
     lineNumbers: true,
     theme: 'material',
     mode: 'javascript'
   }"
 ></ngx-codemirror>
+<button class="arcoiris" id="limpiar" type="submit" (click)="actualizar()">Actualizar</button>
 </div>

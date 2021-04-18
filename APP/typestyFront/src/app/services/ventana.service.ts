@@ -7,7 +7,7 @@ import {codeModel} from '../models/code-model'
 export class VentanaService {
   listaVentanas: codeModel[];
   ventanaActual:number;
-  temporal: codeModel[];
+  private temporal: codeModel[];
   constructor() {
     this.listaVentanas = [];
     this.temporal = [];
