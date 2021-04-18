@@ -6,6 +6,7 @@ const controllador = require("./controllers/Grammar")
 //import {expresion} from "../calses/expresion"
 const E = require("./calses/expresion")
 const S = require("./Enviroment/simbolos")
+const I = require("./Enviroment/instruccion")
 var numeroLinea = 1;
 %}
 %lex 
@@ -13,9 +14,9 @@ var numeroLinea = 1;
 
 %%
 /*comentarios*/
-("/"{2,})([^\n])*\n {console.log(yytext);}
+("/"{2,})([^\n])*\n\b {}
 //("/""*")([^\n\r]|\n)*("*/") {console.log(yytext);}
-"/""*"(([^\n\r]|\n)*)("*""/") {console.log(yytext);}
+"/""*"(([^\n\r]|\n)*)("*""/") {}
 /* tipos de datos */
 "exec"          return 'func_exec';
 "int"           return 'def_entero';
@@ -61,6 +62,7 @@ var numeroLinea = 1;
 /* datos */
 [0-9]+("."[0-9]+)?\b       return 'decimal';
 [0-9]+\b                    return 'entero';
+("\"")([^\"]*)("\"")        return 'cadena'
 "true"          return 'verdadero';
 "false"         return 'falso';
 ([a-z]|[A-Z])+([a-z]|[0-9]|"_")*\b return 'identificador'
@@ -96,8 +98,8 @@ INSTRUCCIONES: INSTRUCCIONES INSTRUCCION
 
 BLOQUE_SENTENCIAS: llave_abre INSTRUCCIONES llave_cierra;
 
-INSTRUCCION: ASIGNACION
-            |DECLARACION{controllador.Grammar.consola +=$$.printInfo()+"\n";}
+INSTRUCCION: ASIGNACION {controllador.Grammar.listaInstrucciones.push($1);}
+            |DECLARACION{controllador.Grammar.consola +=$$.printInfo()+"\n";controllador.Grammar.listaInstrucciones.push($1);}
             |LLAMADA_FUNCION
             |SENTENCIA_CONTROL ;
 
