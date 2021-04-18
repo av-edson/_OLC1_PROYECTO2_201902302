@@ -36,7 +36,7 @@ div{
 .menu ul li{
     float: left;
     margin: 0;
-    font-size:22px;
+    font-size:15px;
     margin-right: 7px;
     margin-left: 20px;
     margin-top: 10px;
@@ -45,7 +45,7 @@ div{
 .menu2 .ul2 li{
     float: left;
     margin: 0;
-    font-size:22px;
+    font-size:13px;
     margin: 5px;
 }
 
@@ -96,5 +96,5 @@ a{
 
   .arcoiris:hover{
     background-position: 0;
-    font-size: 70%;
+    font-size: 110%;
   }

@@ -19,6 +19,7 @@ import { NgxFileHelpersModule } from 'ngx-file-helpers';
 
 // para comunicacion con back
 import { HttpClientModule } from '@angular/common/http';
+import { SalidasComponent } from './components/salidas/salidas.component';
 
 
 @NgModule({
@@ -31,6 +32,7 @@ import { HttpClientModule } from '@angular/common/http';
     PestanaComponent,
     EditorComponent,
     HomeComponent,
+    SalidasComponent,
   ],
   imports: [
     BrowserModule,

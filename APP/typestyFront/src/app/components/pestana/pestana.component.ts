@@ -3,6 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import {VentanaService} from '../../services/ventana.service';
 import {CompilarService} from '../../services/compilar.service'
 import {codeModel} from '../../models/code-model'
+import {errorModel} from '../../models/error-model'
 
 @Component({
   selector: 'app-pestana',
@@ -14,11 +15,13 @@ export class PestanaComponent implements OnInit {
   private regresoCompilador: any = [];
   private temporal:codeModel;
   regresoConsosla:string=''
+  regresoErrores:Array<errorModel>=[];
   constructor(public dataService:VentanaService,private compi:CompilarService) { 
     this.temporal={
       numeroVista: 0,
     code: '',
-    console:''
+    console:'',
+    listaE: []
     }
   }
   
@@ -33,8 +36,7 @@ export class PestanaComponent implements OnInit {
     this.compi.compilarContenido(this.temporal).subscribe(
       (res) => {  
         this.regresoCompilador = res;
-        //console.log(this.regresoCompilador.mensaje)
-        this.otro(this.regresoCompilador.mensaje)
+        this.regresarContenido(this.regresoCompilador.mensaje,this.regresoCompilador.errores)
       },
       (err) => console.error(err)
     );
@@ -42,10 +44,13 @@ export class PestanaComponent implements OnInit {
     //this.dataService.listaVentanas[this.dataService.ventanaActual].console = this.regresoCompilador.mensaje;
   }
 
-  otro(conntenido:string){
+  regresarContenido(conntenido:string,erroes:Array<errorModel>){
     this.dataService.listaVentanas[this.dataService.ventanaActual].console = conntenido;
-    console.log(this.dataService.listaVentanas[this.dataService.ventanaActual].console);
+    this.dataService.listaVentanas[this.dataService.ventanaActual].listaE = erroes
+    
     this.regresoConsosla = this.dataService.listaVentanas[this.dataService.ventanaActual].console;
+    this.regresoErrores = this.dataService.listaVentanas[this.dataService.ventanaActual].listaE
+    console.log(this.dataService.listaVentanas[this.dataService.ventanaActual].listaE)
     alert('Compilacion Exiitosa')
   }
 }

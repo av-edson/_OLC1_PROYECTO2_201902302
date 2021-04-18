@@ -5,6 +5,7 @@ const controllador = require("./controllers/Grammar")
 //import { simbolo } from "../Enviroment/simbolos";
 //import {expresion} from "../calses/expresion"
 const E = require("./calses/expresion")
+const Err = require("./calses/error")
 const S = require("./Enviroment/simbolos")
 const I = require("./Enviroment/instruccion")
 var numeroLinea = 1;
@@ -25,11 +26,11 @@ var numeroLinea = 1;
 "string"        return 'def_cadena';
 "boolean"       return 'def_boolean';
 /* secuencias de escape */
-\\n             return 'esc_salto_linea';
-\\             return 'esc_barra_invertida';
-\\\"             return 'esc_comilla_doble';
-\\t             return 'esc_tabulacion';
-\\\'             return 'esc_comilla_simple';
+"\\n"             return 'esc_salto_linea';
+"\\\""             return 'esc_comilla_doble';
+"\\t"             return 'esc_tabulacion';
+"\\'"             return 'esc_comilla_simple';
+"\\"             return 'esc_barra_invertida';
 /*  operadores aritmeticos */
 "+"              return 'suma';
 "-"              return 'resta';
@@ -62,7 +63,8 @@ var numeroLinea = 1;
 /* datos */
 [0-9]+("."[0-9]+)?\b       return 'decimal';
 [0-9]+\b                    return 'entero';
-("\"")([^\"]*)("\"")        return 'cadena'
+("\"")([^\"]*)("\"")         return 'cadena';
+"'"([^']*)"'"         return 'caracter';
 "true"          return 'verdadero';
 "false"         return 'falso';
 ([a-z]|[A-Z])+([a-z]|[0-9]|"_")*\b return 'identificador'
@@ -70,8 +72,7 @@ var numeroLinea = 1;
 
 <<EOF>>     return 'EOF';
 
-.       {const errores_lexicos = require("./controllers/Grammar")
-            errores_lexicos.Grammar.consola += "-> Error Lexico: No se esperaba "+ yytext + ', en la linea: ' + yylloc.first_line + ', en la columna: ' + yylloc.first_column+"\n"}
+.       {let err = new Err.Error("Error Lexico","No se esperaba "+ yytext,yylloc.first_line,yylloc.first_column); controllador.Grammar.listaErrores.push(err);}
 
 /lex 
 /* precedencia*/
@@ -124,7 +125,9 @@ EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExp
 DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.decimal,String($1));}
         |entero    {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.entero,String($1));}
         |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1));}
-        |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1));};
+        |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1));}
+        |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,numeroLinea,@1.first_column,S.tipoDatos.cadena,String($1));}
+        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,numeroLinea,@1.first_column,S.tipoDatos.caracter,String($1));};
 
 TIPO_DATO: def_entero {$$ = new S.simbolo(S.tipoDatos.entero,null);}
             |def_decimal{$$ = new S.simbolo(S.tipoDatos.decimal,null);}

@@ -11,3 +11,4 @@ class Grammar {
 exports.Grammar = Grammar;
 Grammar.consola = "";
 Grammar.listaInstrucciones = [];
+Grammar.listaErrores = [];

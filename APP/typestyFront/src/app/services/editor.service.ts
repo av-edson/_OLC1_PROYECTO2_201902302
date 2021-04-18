@@ -9,7 +9,7 @@ export class EditorService {
   private temporal: codeModel;
   contenidoEditor:string = ""
   constructor() {
-    this.temporal = {numeroVista: 0,code: '',console:''};
+    this.temporal = {numeroVista: 0,code: '',console:'',listaE:[]};
    }
 
 }

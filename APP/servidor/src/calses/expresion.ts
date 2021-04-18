@@ -171,6 +171,7 @@ export enum tipoExpresion{
     identificador,
     booleano,
     cadena,
+    caracter,
     funcion,
     nulo
 }

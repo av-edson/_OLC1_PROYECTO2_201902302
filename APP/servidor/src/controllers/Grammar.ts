@@ -1,6 +1,7 @@
 export  class Grammar{
     static consola:string="";
     static listaInstrucciones = [];
+    static listaErrores = [];
     constructor(){
         
     }

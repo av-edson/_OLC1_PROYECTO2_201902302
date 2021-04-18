@@ -28,7 +28,7 @@ export class EncabezadoComponent implements OnInit {
     
     // ------------------------
     this.auxiliar = {numeroVista:this.dataService2.lista.getSize(), code:this.dataServise.contenidoEditor, 
-    console:''}
+    console:'',listaE:[]}
     this.dataService3.listaVentanas.push(this.auxiliar)
     this.dataService2.lista.append(this.dataService2.lista.getSize());
    }
@@ -43,7 +43,7 @@ export class EncabezadoComponent implements OnInit {
       this.dataService3.listaVentanas[this.indiceVentana].code = this.dataServise.contenidoEditor;
       this.indiceVentana++;
 
-      this.auxiliar = {numeroVista:this.dataService2.lista.getSize(), code:'',console:''}
+      this.auxiliar = {numeroVista:this.dataService2.lista.getSize(), code:'',console:'',listaE:[]}
       this.dataService3.listaVentanas.push(this.auxiliar)
 
       this.dataService2.lista.append(this.dataService2.lista.getSize());

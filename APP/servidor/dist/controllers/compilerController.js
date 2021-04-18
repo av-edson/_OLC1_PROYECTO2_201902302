@@ -7,10 +7,12 @@ const compilarEntrada = (req, res) => {
     var parser = require('../j.js');
     Grammar_1.Grammar.consola = "";
     Grammar_1.Grammar.listaInstrucciones = [];
+    Grammar_1.Grammar.listaErrores = [];
     parser.parse(conteido);
-    console.log(Grammar_1.Grammar.listaInstrucciones);
+    console.log(Grammar_1.Grammar.listaErrores);
     res.json({
-        mensaje: Grammar_1.Grammar.consola
+        mensaje: Grammar_1.Grammar.consola,
+        errores: Grammar_1.Grammar.listaErrores
     });
 };
 exports.compilarEntrada = compilarEntrada;

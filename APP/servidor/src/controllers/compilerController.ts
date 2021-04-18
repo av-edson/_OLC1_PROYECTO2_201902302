@@ -6,10 +6,12 @@ export const compilarEntrada = (req:Request, res:Response) => {
     var parser = require('../j.js')
     Grammar.consola = ""
     Grammar.listaInstrucciones = []
+    Grammar.listaErrores = []
     parser.parse(conteido)
-    console.log(Grammar.listaInstrucciones)
+    console.log(Grammar.listaErrores)
     res.json({
-        mensaje: Grammar.consola
+        mensaje: Grammar.consola,
+        errores: Grammar.listaErrores
     })
 }
 
