@@ -153,6 +153,30 @@ export class expresion implements instruccion{
             return tipoDatos.nulo
         }
     }
+
+    private suma(derecho:expresion|null,izquierdo:expresion|null):simbolo{
+        var temp:simbolo = new simbolo(tipoDatos.nulo,null);
+        if (derecho==null || izquierdo==null) {
+            return new simbolo(tipoDatos.error,null)
+        }else if(derecho.simbol.tipo==tipoDatos.error || izquierdo.simbol.tipo==tipoDatos.error){
+            return new simbolo(tipoDatos.error,null)
+        }
+        else{
+            switch (izquierdo?.simbol.tipo) {
+                case tipoDatos.entero:
+                    break;
+                case tipoDatos.decimal:
+                    break;
+                case tipoDatos.booleano:
+                    break;
+                case tipoDatos.cadena:
+                    break;
+                case tipoDatos.caracter:
+                    break;
+            }
+            return temp;
+        }
+    }
 }
 
 export enum tipoExpresion{

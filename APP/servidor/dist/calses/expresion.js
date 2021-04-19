@@ -143,6 +143,30 @@ class expresion {
             return simbolos_1.tipoDatos.nulo;
         }
     }
+    suma(derecho, izquierdo) {
+        var temp = new simbolos_1.simbolo(simbolos_1.tipoDatos.nulo, null);
+        if (derecho == null || izquierdo == null) {
+            return new simbolos_1.simbolo(simbolos_1.tipoDatos.error, null);
+        }
+        else if (derecho.simbol.tipo == simbolos_1.tipoDatos.error || izquierdo.simbol.tipo == simbolos_1.tipoDatos.error) {
+            return new simbolos_1.simbolo(simbolos_1.tipoDatos.error, null);
+        }
+        else {
+            switch (izquierdo === null || izquierdo === void 0 ? void 0 : izquierdo.simbol.tipo) {
+                case simbolos_1.tipoDatos.entero:
+                    break;
+                case simbolos_1.tipoDatos.decimal:
+                    break;
+                case simbolos_1.tipoDatos.booleano:
+                    break;
+                case simbolos_1.tipoDatos.cadena:
+                    break;
+                case simbolos_1.tipoDatos.caracter:
+                    break;
+            }
+            return temp;
+        }
+    }
 }
 exports.expresion = expresion;
 var tipoExpresion;

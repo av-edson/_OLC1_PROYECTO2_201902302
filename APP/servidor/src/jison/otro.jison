@@ -1,4 +1,5 @@
 %lex
+%yyerror
 %options case-insensitive
 
 %%

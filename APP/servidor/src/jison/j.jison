@@ -63,7 +63,7 @@ var numeroLinea = 1;
 /* datos */
 [0-9]+("."[0-9]+)?\b       return 'decimal';
 [0-9]+\b                    return 'entero';
-("\"")([^\"]*)("\"")         return 'cadena';
+("\"")([^\"\\]|\\.)*("\"")         return 'cadena';
 "'"([^']*)"'"         return 'caracter';
 "true"          return 'verdadero';
 "false"         return 'falso';
@@ -75,6 +75,9 @@ var numeroLinea = 1;
 .       {let err = new Err.Error("Error Lexico","No se esperaba "+ yytext,yylloc.first_line,yylloc.first_column); controllador.Grammar.listaErrores.push(err);}
 
 /lex 
+%locations;
+%yyerror;
+%YYERROR_VERBOSE;
 /* precedencia*/
 %left 'op_or'
 %left 'op_and'
@@ -87,7 +90,6 @@ var numeroLinea = 1;
 //%left negado
 
 %start INICIAL
-%locations
 %%
 /*
 inicial : FUNC_EXEC EOF {const gramatica = require("./controllers/Grammar")
@@ -102,7 +104,8 @@ BLOQUE_SENTENCIAS: llave_abre INSTRUCCIONES llave_cierra;
 INSTRUCCION: ASIGNACION {controllador.Grammar.listaInstrucciones.push($1);}
             |DECLARACION{controllador.Grammar.consola +=$$.printInfo()+"\n";controllador.Grammar.listaInstrucciones.push($1);}
             |LLAMADA_FUNCION
-            |SENTENCIA_CONTROL ;
+            |SENTENCIA_CONTROL 
+            | error punto_coma {let err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);};
 
 DECLARACION: TIPO_DATO identificador punto_coma{$$ = new S.simbolo($1.getTipoDato(),$1.getValor());};
 
