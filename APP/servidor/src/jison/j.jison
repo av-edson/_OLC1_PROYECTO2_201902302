@@ -8,6 +8,7 @@ const E = require("./calses/expresion")
 const Err = require("./calses/error")
 const S = require("./Enviroment/simbolos")
 const I = require("./Enviroment/instruccion")
+var err;
 var numeroLinea = 1;
 %}
 %lex 
@@ -37,7 +38,7 @@ var numeroLinea = 1;
 "*"              return 'multiplicacion';
 "/"              return 'division';
 "^"             return 'potencia';
-"%"             return 'modulo';
+"%"             return 'op_modulo';
 /* operadores relacionales */
 "="             return 'op_igual';
 "=="            return 'op_doble_igual';
@@ -61,7 +62,7 @@ var numeroLinea = 1;
 [ \r\t]     {};
 \n          {numeroLinea++};
 /* datos */
-[0-9]+("."[0-9]+)?\b       return 'decimal';
+[0-9]+("."[0-9]+)\b       return 'decimal';
 [0-9]+\b                    return 'entero';
 ("\"")([^\"\\]|\\.)*("\"")         return 'cadena';
 "'"([^']*)"'"         return 'caracter';
@@ -75,9 +76,6 @@ var numeroLinea = 1;
 .       {let err = new Err.Error("Error Lexico","No se esperaba "+ yytext,yylloc.first_line,yylloc.first_column); controllador.Grammar.listaErrores.push(err);}
 
 /lex 
-%locations;
-%yyerror;
-%YYERROR_VERBOSE;
 /* precedencia*/
 %left 'op_or'
 %left 'op_and'
@@ -85,7 +83,7 @@ var numeroLinea = 1;
 %left 'op_doble_igual' 'op_diferencia' 'op_menor' 'op_menor_igual' 'op_mayor' 'op_mayor_igual'
 %left 'suma' 'resta'
 %left 'multiplicacion' 'division'
-%left 'potencia'
+%left 'potencia' 'op_modulo'
 %left UNMENOS
 //%left negado
 
@@ -101,36 +99,41 @@ INSTRUCCIONES: INSTRUCCIONES INSTRUCCION
 
 BLOQUE_SENTENCIAS: llave_abre INSTRUCCIONES llave_cierra;
 
-INSTRUCCION: ASIGNACION {controllador.Grammar.listaInstrucciones.push($1);}
-            |DECLARACION{controllador.Grammar.consola +=$$.printInfo()+"\n";controllador.Grammar.listaInstrucciones.push($1);}
+INSTRUCCION: ASIGNACION punto_coma{controllador.Grammar.listaInstrucciones.push($1);}
+            |DECLARACION punto_coma{controllador.Grammar.consola +=$$.printInfo()+"\n";controllador.Grammar.listaInstrucciones.push($1);}
             |LLAMADA_FUNCION
             |SENTENCIA_CONTROL 
-            | error punto_coma {let err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);};
+            |ASIGNACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);}
+            |DECLARACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);}
+            | error punto_coma { err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);};
 
-DECLARACION: TIPO_DATO identificador punto_coma{$$ = new S.simbolo($1.getTipoDato(),$1.getValor());};
+DECLARACION: TIPO_DATO identificador {$$ = new S.simbolo($1.getTipoDato(),$1.getValor());};
 
-ASIGNACION: identificador op_igual EXPRESION punto_coma{controllador.Grammar.consola += $3.getNombreSimbolo() +" vale: "+ $3.simbol.getValor()+"\n"}
-        |TIPO_DATO identificador op_igual EXPRESION punto_coma{controllador.Grammar.consola += $4.getNombreSimbolo() +" vale: "+ $4.simbol.getValor()+"\n"};
+ASIGNACION: identificador op_igual EXPRESION {controllador.Grammar.consola += $3.getNombreSimbolo() +" vale: "+ $3.simbol.getValor()+"\n"}
+        |TIPO_DATO identificador op_igual EXPRESION {controllador.Grammar.consola += $4.getNombreSimbolo() +" vale: "+ $4.simbol.getValor()+"\n"};
 
 EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExpresion.multiplicacion,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
             |EXPRESION suma EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.suma,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
             |EXPRESION resta EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.resta,numeroLinea,@2.first_column,null,null); $$.ejecutar()}           
             |EXPRESION multiplicacion EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.multiplicacion,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
             |EXPRESION division EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.division,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
+            |EXPRESION potencia EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.potencia,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
+            |EXPRESION op_modulo EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.modulo,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
             |par_abre EXPRESION par_cierra {$$ = $2}
             |EXPRESION op_and EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.and,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
             |EXPRESION op_or EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.or,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
             |op_not EXPRESION{$$ = new E.expresion(null,$2,E.tipoExpresion.not,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
             |EXPRESION op_mayor EXPRESION{}
             |EXPRESION op_menor EXPRESION{}
+            |EXPRESION op_doble_igual EXPRESION{}
             |DATO { controllador.Grammar.consola += $$.getNombreSimbolo() +" vale: "+ $$.simbol.getValor()+" "+$$.noFila+" "+$$.noColumna + "\n";};     
 
 DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.decimal,String($1));}
         |entero    {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.entero,String($1));}
         |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1));}
         |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1));}
-        |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,numeroLinea,@1.first_column,S.tipoDatos.cadena,String($1));}
-        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,numeroLinea,@1.first_column,S.tipoDatos.caracter,String($1));};
+        |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,numeroLinea,@1.first_column,S.tipoDatos.cadena,String($1).slice(1,-1));}
+        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,numeroLinea,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1));};
 
 TIPO_DATO: def_entero {$$ = new S.simbolo(S.tipoDatos.entero,null);}
             |def_decimal{$$ = new S.simbolo(S.tipoDatos.decimal,null);}

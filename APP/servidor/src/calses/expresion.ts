@@ -24,6 +24,9 @@ export class expresion implements instruccion{
     ejecutar(){
         var simboloDerecho = new simbolo(null,null);
         var simboloIzquierdo = new simbolo(null,null);
+        // ------------------------
+        // !!ver si el derechio o izquierdo es variable y hacer validaciones
+        // ----------------------
         switch (this.tipo) {
             case tipoExpresion.suma:
                 this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,1);
@@ -36,6 +39,12 @@ export class expresion implements instruccion{
                 break;
             case tipoExpresion.division:
                 this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,4);
+                break;
+            case tipoExpresion.potencia:
+                this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,5);
+                break;
+            case tipoExpresion.modulo:
+                this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,6);
                 break;
             case tipoExpresion.mayor_que:
                 this.simbol = this.operacionLogica(this.derecho,this.izquierdo,4);
@@ -86,25 +95,31 @@ export class expresion implements instruccion{
     private operacionAritmetica(derecho:expresion|null,izquierdo:expresion|null,tipoOp:number){
         var resultado:number=0;
         if (derecho != null && izquierdo != null) {
-            switch (tipoOp) {
-                case 1:
-                    resultado = Number(izquierdo.simbol.getValor()) + Number(derecho.simbol.getValor())
-                    break;
-                case 2:
-                    resultado = Number(izquierdo.simbol.getValor()) - Number(derecho.simbol.getValor())
-                    break;
-                case 3:
-                        resultado = Number(izquierdo.simbol.getValor()) * Number(derecho.simbol.getValor())
-                    break;
-                case 4:
-                    try {
-                        resultado = Number(izquierdo.simbol.getValor()) / Number(derecho.simbol.getValor())
-                    } catch (error) {
-                        return new simbolo(tipoDatos.error,null);
-                    }
-                    break;
+            try {
+                switch (tipoOp) {
+                    case 1:
+                        return this.suma(derecho,izquierdo);
+                        break;
+                    case 2:
+                        return this.resta(derecho,izquierdo)
+                        break;
+                    case 3:
+                            return this.multiplicacion(derecho,izquierdo)
+                        break;
+                    case 4:
+                        return this.division(derecho,izquierdo)
+                        break;
+                    case 5:
+                        return this.potencia(derecho,izquierdo)
+                        break;
+                    case 6:
+                        return this.modulo(derecho,izquierdo)
+                        break;
+                }
+                return new simbolo(derecho.simbol.tipo,String(resultado))
+            } catch (error) {
+                return new simbolo(tipoDatos.error,null);
             }
-            return new simbolo(derecho.simbol.tipo,String(resultado))
         }
         if (derecho == null && tipoOp == 3 && izquierdo != null) {
             resultado = Number(izquierdo.simbol.getValor()) * -1;
@@ -155,27 +170,393 @@ export class expresion implements instruccion{
     }
 
     private suma(derecho:expresion|null,izquierdo:expresion|null):simbolo{
-        var temp:simbolo = new simbolo(tipoDatos.nulo,null);
+        var temp:simbolo = new simbolo(tipoDatos.error,null);
+        // si es nulo va a ser error
         if (derecho==null || izquierdo==null) {
             return new simbolo(tipoDatos.error,null)
+        // si es error el siguiente tambien es error
         }else if(derecho.simbol.tipo==tipoDatos.error || izquierdo.simbol.tipo==tipoDatos.error){
             return new simbolo(tipoDatos.error,null)
         }
         else{
-            switch (izquierdo?.simbol.tipo) {
+            var dato:number;
+            switch (izquierdo.simbol.tipo) {
                 case tipoDatos.entero:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato= Number(izquierdo.simbol.getValor()) + Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.entero,String(dato))
+                        break;
+                    case tipoDatos.decimal:
+                            dato = Number(izquierdo.simbol.getValor()) + Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                        break;
+                    case tipoDatos.booleano:
+                        dato = Number(izquierdo.simbol.getValor())
+                        if (derecho.simbol.getValor()=="true") dato++;
+                        else dato;
+                        return new simbolo(tipoDatos.entero,String(dato))
+                        break;
+                    case tipoDatos.caracter:
+                        dato = Number(izquierdo.simbol.getValor()) + Number(derecho.simbol.getValor().charCodeAt(0))
+                        return new simbolo(tipoDatos.entero,String(dato))
+                        break;
+                    case tipoDatos.cadena:
+                        let aux = izquierdo.simbol.getValor()+derecho.simbol.getValor()
+                        return new simbolo(tipoDatos.cadena,aux)
+                        break;
+                    }
                     break;
                 case tipoDatos.decimal:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato= Number(izquierdo.simbol.getValor()) + Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                        break;
+                    case tipoDatos.decimal:
+                            dato = Number(izquierdo.simbol.getValor()) + Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                        break;
+                    case tipoDatos.booleano:
+                        dato = Number(izquierdo.simbol.getValor())
+                        if (derecho.simbol.getValor()=="true") dato++;
+                        else dato;
+                        return new simbolo(tipoDatos.decimal,String(dato))
+                        break;
+                    case tipoDatos.caracter:
+                        dato = Number(izquierdo.simbol.getValor()) + Number(derecho.simbol.getValor().charCodeAt(0))
+                        return new simbolo(tipoDatos.decimal,String(dato))
+                        break;
+                    case tipoDatos.cadena:
+                        let aux = izquierdo.simbol.getValor()+derecho.simbol.getValor()
+                        return new simbolo(tipoDatos.cadena,aux)
+                        break;
+                    }
                     break;
                 case tipoDatos.booleano:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato = Number(derecho.simbol.getValor())
+                            if(izquierdo.simbol.getValor()=="true") dato++;
+                            else dato;
+                            return new simbolo(tipoDatos.entero,dato)
+                            break;
+                        case tipoDatos.decimal:
+                            dato = Number(derecho.simbol.getValor())
+                            if(izquierdo.simbol.getValor()=="true") dato++;
+                            else dato;
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        case tipoDatos.cadena:
+                            let aux = izquierdo.simbol.getValor()+derecho.simbol.getValor()
+                            return new simbolo(tipoDatos.cadena,aux)
+                            break;
+                        default:
+                            return new simbolo(tipoDatos.error,null)
+                    }
                     break;
                 case tipoDatos.cadena:
+                        let aux = izquierdo.simbol.getValor()+derecho.simbol.getValor()
+                        return new simbolo(tipoDatos.cadena,aux)
                     break;
                 case tipoDatos.caracter:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato= izquierdo.simbol.getValor().charCodeAt(0) + Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.entero,String(dato))
+                            break;
+                        case tipoDatos.decimal:
+                            dato= izquierdo.simbol.getValor().charCodeAt(0) + Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                            break;
+                        case tipoDatos.caracter:
+                            return new simbolo(tipoDatos.cadena,izquierdo.simbol.getValor()+derecho.simbol.getValor())
+                            break;
+                        case tipoDatos.cadena:
+                            let aux = izquierdo.simbol.getValor()+derecho.simbol.getValor()
+                            return new simbolo(tipoDatos.cadena,aux)
+                            break;
+                        default:
+                            return new simbolo(tipoDatos.error,null)
+                    }
                     break;
             }
             return temp;
         }
+    }
+
+    private resta(derecho:expresion|null,izquierdo:expresion|null):simbolo{
+        var temp:simbolo = new simbolo(tipoDatos.error,null);
+        // error o nulo son errores
+        if (derecho==null || izquierdo==null || derecho.simbol.tipo==tipoDatos.error || izquierdo.simbol.tipo==tipoDatos.error) {
+            return new simbolo(tipoDatos.error,null)
+        // no resta entre cadenas
+        }else if(derecho.simbol.tipo == tipoDatos.cadena ||izquierdo.simbol.tipo == tipoDatos.cadena  ){
+            return new simbolo(tipoDatos.error,null)
+        // no resta entre caracteres
+        }else if(derecho.simbol.tipo == tipoDatos.caracter&&izquierdo.simbol.tipo == tipoDatos.caracter  ){
+            return new simbolo(tipoDatos.error,null)
+        // no resta entre booleanos
+        }else if(derecho.simbol.tipo == tipoDatos.booleano&&izquierdo.simbol.tipo == tipoDatos.booleano  ){
+            return new simbolo(tipoDatos.error,null)
+        }else{
+            var dato:number=0;
+            switch (izquierdo.simbol.tipo) {
+                case tipoDatos.entero:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato= Number(izquierdo.simbol.getValor()) - Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.entero,String(dato))
+                            break;
+                        case tipoDatos.decimal:
+                            dato= Number(izquierdo.simbol.getValor()) - Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                            break;
+                        case tipoDatos.booleano:
+                            dato = Number(izquierdo.simbol.getValor())
+                            if (derecho.simbol.getValor()=="true") dato--
+                            else dato;
+                            return new simbolo(tipoDatos.entero,String(dato))
+                            break;
+                        case tipoDatos.caracter:
+                            dato = Number(izquierdo.simbol.getValor()) - Number(derecho.simbol.getValor().charCodeAt(0))
+                            return new simbolo(tipoDatos.entero,String(dato))
+                            break;
+                        default:
+                            return new simbolo(tipoDatos.error,null)
+                    }
+                    break;
+                case tipoDatos.decimal:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato= Number(izquierdo.simbol.getValor()) - Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                            break;
+                        case tipoDatos.decimal:
+                            dato= Number(izquierdo.simbol.getValor()) - Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                            break;
+                        case tipoDatos.booleano:
+                            dato = Number(izquierdo.simbol.getValor())
+                            if (derecho.simbol.getValor()=="true") dato--
+                            else dato;
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                            break;
+                        case tipoDatos.caracter:
+                            dato = Number(izquierdo.simbol.getValor()) - Number(derecho.simbol.getValor().charCodeAt(0))
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                            break;
+                        default:
+                            return new simbolo(tipoDatos.error,null)
+                    }
+                    break;
+                case tipoDatos.booleano:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato= Number(derecho.simbol.getValor())
+                            if(izquierdo.simbol.getValor()=="true") dato=1-dato;
+                            else dato=0-dato;
+                            return new simbolo(tipoDatos.entero,String(dato))
+                            break;
+                        case tipoDatos.decimal:
+                            dato= Number(derecho.simbol.getValor())
+                            if(izquierdo.simbol.getValor()=="true") dato = 1-dato;
+                            else dato=0-dato;  ;
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                            break;
+                        default:
+                            return new simbolo(tipoDatos.error,null)
+                    }
+                    break;
+                case tipoDatos.caracter:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato= izquierdo.simbol.getValor().charCodeAt(0) - Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.entero,String(dato))
+                            break;
+                        case tipoDatos.decimal:
+                            dato= izquierdo.simbol.getValor().charCodeAt(0) - Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.decimal,String(dato))
+                            break;
+                        default:
+                            return new simbolo(tipoDatos.error,null)
+                    }
+                    break;
+                default:
+                        return new simbolo(tipoDatos.error,null)
+            }
+        }
+        return temp;
+    }    
+
+    private multiplicacion(derecho:expresion|null,izquierdo:expresion|null):simbolo{
+        var temp:simbolo = new simbolo(tipoDatos.error,null);
+        if (derecho==null || izquierdo==null || derecho.simbol.tipo==tipoDatos.error || izquierdo.simbol.tipo==tipoDatos.error) {
+            return new simbolo(tipoDatos.error,null)
+        }else if(derecho.simbol.tipo == tipoDatos.cadena || derecho.simbol.tipo == tipoDatos.booleano){
+            return new simbolo(tipoDatos.error,null);
+        }else if(izquierdo.simbol.tipo == tipoDatos.cadena || izquierdo.simbol.tipo == tipoDatos.booleano){
+            return new simbolo(tipoDatos.error,null);
+        }else{
+            var dato:number;
+            switch (izquierdo.simbol.tipo) {
+                case tipoDatos.entero:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato = Number(izquierdo.simbol.getValor()) * Number(derecho.simbol.getValor());
+                            return new simbolo(tipoDatos.entero,dato)
+                            break;
+                        case tipoDatos.decimal:
+                            dato = Number(izquierdo.simbol.getValor()) * Number(derecho.simbol.getValor());
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        case tipoDatos.caracter:
+                            dato = Number(izquierdo.simbol.getValor()) * derecho.simbol.getValor().charCodeAt(0)
+                            return new simbolo(tipoDatos.entero,dato)
+                            break;    
+                        default:
+                                    return new simbolo(tipoDatos.error,null)
+                    }
+                    break;
+                case tipoDatos.decimal:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato = Number(izquierdo.simbol.getValor()) * Number(derecho.simbol.getValor());
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        case tipoDatos.decimal:
+                            dato = Number(izquierdo.simbol.getValor()) * Number(derecho.simbol.getValor());
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        case tipoDatos.caracter:
+                            dato = Number(izquierdo.simbol.getValor()) * derecho.simbol.getValor().charCodeAt(0)
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;    
+                        default:
+                                    return new simbolo(tipoDatos.error,null)
+                    }
+                    break;
+                case tipoDatos.caracter:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato = Number(derecho.simbol.getValor()) * izquierdo.simbol.getValor().charCodeAt(0)
+                            return new simbolo(tipoDatos.entero,dato)
+                            break;
+                        case tipoDatos.decimal:
+                            dato = Number(derecho.simbol.getValor()) * izquierdo.simbol.getValor().charCodeAt(0)
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        default:
+                                    return new simbolo(tipoDatos.error,null)
+                    }
+                    break;    
+                default:
+                            return new simbolo(tipoDatos.error,null)
+            }
+        }
+        return temp;
+    }
+
+    private division(derecho:expresion|null,izquierdo:expresion|null):simbolo{
+        var temp:simbolo = new simbolo(tipoDatos.error,null);
+        if (derecho==null || izquierdo==null || derecho.simbol.tipo==tipoDatos.error || izquierdo.simbol.tipo==tipoDatos.error) {
+            return new simbolo(tipoDatos.error,null)
+        }else if(derecho.simbol.tipo == tipoDatos.cadena || derecho.simbol.tipo == tipoDatos.booleano){
+            return new simbolo(tipoDatos.error,null);
+        }else if(izquierdo.simbol.tipo == tipoDatos.cadena || izquierdo.simbol.tipo == tipoDatos.booleano){
+            return new simbolo(tipoDatos.error,null);
+        }else{
+            var dato:number;
+            switch (izquierdo.simbol.tipo) {
+                case tipoDatos.entero:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato = Number(izquierdo.simbol.getValor()) / Number(derecho.simbol.getValor());
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        case tipoDatos.decimal:
+                            dato = Number(izquierdo.simbol.getValor()) / Number(derecho.simbol.getValor());
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        case tipoDatos.caracter:
+                            dato = Number(izquierdo.simbol.getValor()) / derecho.simbol.getValor().charCodeAt(0)
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;    
+                        default:
+                                    return new simbolo(tipoDatos.error,null)
+                    }
+                    break;
+                case tipoDatos.decimal:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato = Number(izquierdo.simbol.getValor()) / Number(derecho.simbol.getValor());
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        case tipoDatos.decimal:
+                            dato = Number(izquierdo.simbol.getValor()) / Number(derecho.simbol.getValor());
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        case tipoDatos.caracter:
+                            dato = Number(izquierdo.simbol.getValor()) / derecho.simbol.getValor().charCodeAt(0)
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;    
+                        default:
+                                    return new simbolo(tipoDatos.error,null)
+                    }
+                    break;
+                case tipoDatos.caracter:
+                    switch (derecho.simbol.tipo) {
+                        case tipoDatos.entero:
+                            dato = izquierdo.simbol.getValor().charCodeAt(0) / Number(derecho.simbol.getValor()) 
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        case tipoDatos.decimal:
+                            dato = izquierdo.simbol.getValor().charCodeAt(0) / Number(derecho.simbol.getValor())
+                            return new simbolo(tipoDatos.decimal,dato)
+                            break;
+                        default:
+                                    return new simbolo(tipoDatos.error,null)
+                    }
+                    break;    
+                default:
+                            return new simbolo(tipoDatos.error,null)
+            }
+        }
+        return temp;
+    }
+
+    private potencia(derecho:expresion|null,izquierdo:expresion|null):simbolo{
+        var temp:simbolo = new simbolo(tipoDatos.error,null);
+        if (derecho==null || izquierdo==null || derecho.simbol.tipo==tipoDatos.error || izquierdo.simbol.tipo==tipoDatos.error) {
+            return new simbolo(tipoDatos.error,null)
+        }else if (derecho.simbol.tipo==tipoDatos.booleano||derecho.simbol.tipo==tipoDatos.caracter||derecho.simbol.tipo==tipoDatos.cadena) {
+            return new simbolo(tipoDatos.error,null)
+        }else if (izquierdo.simbol.tipo==tipoDatos.booleano||izquierdo.simbol.tipo==tipoDatos.caracter||izquierdo.simbol.tipo==tipoDatos.cadena) {
+            return new simbolo(tipoDatos.error,null)
+        }else{
+            var dato:number = Math.pow(Number(izquierdo.simbol.getValor()),Number(derecho.simbol.getValor()))
+            if (derecho.simbol.tipo==izquierdo.simbol.tipo&&izquierdo.simbol.tipo==tipoDatos.entero) {
+                return new simbolo(tipoDatos.entero,dato);
+            }else{
+                return new simbolo(tipoDatos.decimal,dato);
+            }
+        }
+        return temp;
+    }
+
+    private modulo(derecho:expresion|null,izquierdo:expresion|null):simbolo{
+        var temp:simbolo = new simbolo(tipoDatos.error,null);
+        if (derecho==null || izquierdo==null || derecho.simbol.tipo==tipoDatos.error || izquierdo.simbol.tipo==tipoDatos.error) {
+            return new simbolo(tipoDatos.error,null)
+        }else if (derecho.simbol.tipo==tipoDatos.booleano||derecho.simbol.tipo==tipoDatos.caracter||derecho.simbol.tipo==tipoDatos.cadena) {
+            return new simbolo(tipoDatos.error,null)
+        }else if (izquierdo.simbol.tipo==tipoDatos.booleano||izquierdo.simbol.tipo==tipoDatos.caracter||izquierdo.simbol.tipo==tipoDatos.cadena) {
+            return new simbolo(tipoDatos.error,null)
+        }else{
+            var dato:number = Number(izquierdo.simbol.getValor()) % Number(derecho.simbol.getValor())
+            return new simbolo(tipoDatos.decimal,dato);
+        }
+        return temp;
     }
 }
 
@@ -184,6 +565,8 @@ export enum tipoExpresion{
     resta,
     multiplicacion,
     division,
+    potencia,
+    modulo,
     mayor_que,
     menor_que,
     mayor_igual_que,

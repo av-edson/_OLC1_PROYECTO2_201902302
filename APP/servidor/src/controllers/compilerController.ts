@@ -8,7 +8,7 @@ export const compilarEntrada = (req:Request, res:Response) => {
     Grammar.listaInstrucciones = []
     Grammar.listaErrores = []
     parser.parse(conteido)
-    console.log(Grammar.listaErrores)
+    //console.log(Grammar.listaErrores)
     res.json({
         mensaje: Grammar.consola,
         errores: Grammar.listaErrores

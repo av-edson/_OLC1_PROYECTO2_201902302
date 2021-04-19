@@ -9,7 +9,7 @@ const compilarEntrada = (req, res) => {
     Grammar_1.Grammar.listaInstrucciones = [];
     Grammar_1.Grammar.listaErrores = [];
     parser.parse(conteido);
-    console.log(Grammar_1.Grammar.listaErrores);
+    //console.log(Grammar.listaErrores)
     res.json({
         mensaje: Grammar_1.Grammar.consola,
         errores: Grammar_1.Grammar.listaErrores
