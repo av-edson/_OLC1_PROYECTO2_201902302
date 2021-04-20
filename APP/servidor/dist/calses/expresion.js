@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tipoExpresion = exports.expresion = void 0;
 const simbolos_1 = require("../Enviroment/simbolos");
+const expRelacionales_1 = require("./expRelacionales");
 class expresion {
     constructor(derecho, izquierdo, tipo, fila, columna, tipoDato, valor) {
         this.derecho = derecho;
@@ -48,6 +49,12 @@ class expresion {
             case tipoExpresion.menor_igual_que:
                 this.simbol = this.operacionLogica(this.derecho, this.izquierdo, 7);
                 break;
+            case tipoExpresion.igualdad:
+                this.simbol = this.operacionLogica(this.derecho, this.izquierdo, 8);
+                break;
+            case tipoExpresion.diferencia:
+                this.simbol = this.operacionLogica(this.derecho, this.izquierdo, 9);
+                break;
             case tipoExpresion.and:
                 this.simbol = this.operacionLogica(this.derecho, this.izquierdo, 1);
                 break;
@@ -73,6 +80,9 @@ class expresion {
                 break;
             case tipoExpresion.nulo:
                 break;
+        }
+        if (this.simbol.tipo == simbolos_1.tipoDatos.error) {
+            this.simbol.valor = "Error semantico en la operacion " + this.getOperacion();
         }
     }
     getColumn() {
@@ -119,6 +129,7 @@ class expresion {
     }
     operacionLogica(derecho, izquierdo, tipoOp) {
         var resultado;
+        var op = new expRelacionales_1.OpeRelacionales();
         switch (tipoOp) {
             case 1:
                 if ((derecho === null || derecho === void 0 ? void 0 : derecho.simbol.getValor()) == "true" && (izquierdo === null || izquierdo === void 0 ? void 0 : izquierdo.simbol.getValor()) == "true") {
@@ -145,7 +156,25 @@ class expresion {
                 }
                 break;
             case 4:
+                return op.mayor(derecho, izquierdo);
                 break;
+            case 5:
+                return op.menor(derecho, izquierdo);
+                break;
+            case 6:
+                return op.mayorIgual(derecho, izquierdo);
+                break;
+            case 7:
+                return op.menorIgual(derecho, izquierdo);
+                break;
+            case 8:
+                return op.igualIgual(derecho, izquierdo);
+                break;
+            case 9:
+                return op.diferente(derecho, izquierdo);
+                break;
+            default:
+                return new simbolos_1.simbolo(simbolos_1.tipoDatos.error, null);
         }
         return new simbolos_1.simbolo(simbolos_1.tipoDatos.error, null);
     }
@@ -156,6 +185,15 @@ class expresion {
         }
         else {
             return simbolos_1.tipoDatos.nulo;
+        }
+    }
+    getOperacion() {
+        if (this.tipo != null) {
+            let tipo = tipoExpresion[this.tipo];
+            return tipo;
+        }
+        else {
+            return tipoExpresion.nulo;
         }
     }
     suma(derecho, izquierdo) {
@@ -591,14 +629,16 @@ var tipoExpresion;
     tipoExpresion[tipoExpresion["menor_que"] = 7] = "menor_que";
     tipoExpresion[tipoExpresion["mayor_igual_que"] = 8] = "mayor_igual_que";
     tipoExpresion[tipoExpresion["menor_igual_que"] = 9] = "menor_igual_que";
-    tipoExpresion[tipoExpresion["and"] = 10] = "and";
-    tipoExpresion[tipoExpresion["or"] = 11] = "or";
-    tipoExpresion[tipoExpresion["not"] = 12] = "not";
-    tipoExpresion[tipoExpresion["numero"] = 13] = "numero";
-    tipoExpresion[tipoExpresion["identificador"] = 14] = "identificador";
-    tipoExpresion[tipoExpresion["booleano"] = 15] = "booleano";
-    tipoExpresion[tipoExpresion["cadena"] = 16] = "cadena";
-    tipoExpresion[tipoExpresion["caracter"] = 17] = "caracter";
-    tipoExpresion[tipoExpresion["funcion"] = 18] = "funcion";
-    tipoExpresion[tipoExpresion["nulo"] = 19] = "nulo";
+    tipoExpresion[tipoExpresion["igualdad"] = 10] = "igualdad";
+    tipoExpresion[tipoExpresion["diferencia"] = 11] = "diferencia";
+    tipoExpresion[tipoExpresion["and"] = 12] = "and";
+    tipoExpresion[tipoExpresion["or"] = 13] = "or";
+    tipoExpresion[tipoExpresion["not"] = 14] = "not";
+    tipoExpresion[tipoExpresion["numero"] = 15] = "numero";
+    tipoExpresion[tipoExpresion["identificador"] = 16] = "identificador";
+    tipoExpresion[tipoExpresion["booleano"] = 17] = "booleano";
+    tipoExpresion[tipoExpresion["cadena"] = 18] = "cadena";
+    tipoExpresion[tipoExpresion["caracter"] = 19] = "caracter";
+    tipoExpresion[tipoExpresion["funcion"] = 20] = "funcion";
+    tipoExpresion[tipoExpresion["nulo"] = 21] = "nulo";
 })(tipoExpresion = exports.tipoExpresion || (exports.tipoExpresion = {}));

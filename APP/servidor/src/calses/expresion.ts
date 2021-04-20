@@ -1,6 +1,7 @@
 import { Ambiente } from "../Enviroment/enviroment";
 import { instruccion } from "../Enviroment/instruccion";
 import { simbolo,tipoDatos } from "../Enviroment/simbolos";
+import {OpeRelacionales} from "./expRelacionales"
 
 export class expresion implements instruccion{
 
@@ -58,6 +59,12 @@ export class expresion implements instruccion{
             case tipoExpresion.menor_igual_que:
                 this.simbol = this.operacionLogica(this.derecho,this.izquierdo,7);
                 break;
+            case tipoExpresion.igualdad:
+                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,8);
+                break;
+            case tipoExpresion.diferencia:
+                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,9);
+                break;
             case tipoExpresion.and:
                 this.simbol = this.operacionLogica(this.derecho,this.izquierdo,1);
                 break;
@@ -83,6 +90,9 @@ export class expresion implements instruccion{
                 break;
             case tipoExpresion.nulo:
                 break;
+        }
+        if (this.simbol.tipo==tipoDatos.error) {
+            this.simbol.valor = "Error semantico en la operacion "+this.getOperacion();
         }
     }
     getColumn():number{
@@ -130,6 +140,7 @@ export class expresion implements instruccion{
 
     private operacionLogica(derecho:expresion|null,izquierdo:expresion|null,tipoOp:number){
         var resultado:boolean;
+        var op = new OpeRelacionales();
         switch (tipoOp) {
             case 1:
                 if (derecho?.simbol.getValor()=="true" && izquierdo?.simbol.getValor()=="true") {
@@ -153,8 +164,25 @@ export class expresion implements instruccion{
                 }
                 break;
             case 4:
-                
+                return op.mayor(derecho,izquierdo)
                 break;
+            case 5:
+                return op.menor(derecho,izquierdo)
+                break;
+            case 6:
+                return op.mayorIgual(derecho,izquierdo)
+                break;
+            case 7:
+                return op.menorIgual(derecho,izquierdo)
+                break;
+            case 8:
+                return op.igualIgual(derecho,izquierdo)
+                break
+            case 9:
+                return op.diferente(derecho,izquierdo);
+                break;
+            default:
+                return new simbolo(tipoDatos.error,null)
         }
         return new simbolo(tipoDatos.error,null);
     }
@@ -166,6 +194,16 @@ export class expresion implements instruccion{
         }
         else{
             return tipoDatos.nulo
+        }
+    }
+
+    private getOperacion(){
+        if (this.tipo != null) {
+            let tipo = tipoExpresion[this.tipo]
+            return tipo
+        }
+        else{
+            return tipoExpresion.nulo
         }
     }
 
@@ -571,6 +609,8 @@ export enum tipoExpresion{
     menor_que,
     mayor_igual_que,
     menor_igual_que,
+    igualdad,
+    diferencia,
     and,
     or,
     not,

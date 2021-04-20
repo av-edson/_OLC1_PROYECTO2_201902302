@@ -40,13 +40,13 @@ var numeroLinea = 1;
 "^"             return 'potencia';
 "%"             return 'op_modulo';
 /* operadores relacionales */
-"="             return 'op_igual';
 "=="            return 'op_doble_igual';
-"!="            return 'op_diferencia';
-"<"             return 'op_menor';
-">"             return 'op_mayor';
 "<="            return 'op_menor_igual';
 ">="            return 'op_mayor_igual';
+"!="            return 'op_diferencia';
+"="             return 'op_igual';
+"<"             return 'op_menor';
+">"             return 'op_mayor';
 /* falta operador ternario */
 /*  operadores logicos*/
 "||"            return 'op_or';
@@ -123,9 +123,12 @@ EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExp
             |EXPRESION op_and EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.and,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
             |EXPRESION op_or EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.or,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
             |op_not EXPRESION{$$ = new E.expresion(null,$2,E.tipoExpresion.not,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |EXPRESION op_mayor EXPRESION{}
-            |EXPRESION op_menor EXPRESION{}
-            |EXPRESION op_doble_igual EXPRESION{}
+            |EXPRESION op_mayor EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.mayor_que,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
+            |EXPRESION op_menor EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.menor_que,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
+            |EXPRESION op_mayor_igual EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.mayor_igual_que,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
+            |EXPRESION op_menor_igual EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.menor_igual_que,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
+            |EXPRESION op_doble_igual EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.igualdad,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
+            |EXPRESION op_diferencia EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.diferencia,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
             |DATO { controllador.Grammar.consola += $$.getNombreSimbolo() +" vale: "+ $$.simbol.getValor()+" "+$$.noFila+" "+$$.noColumna + "\n";};     
 
 DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.decimal,String($1));}
