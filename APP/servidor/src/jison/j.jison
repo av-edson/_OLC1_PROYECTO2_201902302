@@ -33,6 +33,8 @@ var numeroLinea = 1;
 "\\'"             return 'esc_comilla_simple';
 "\\"             return 'esc_barra_invertida';
 /*  operadores aritmeticos */
+"++"            return 'incremento';
+"--"            return 'decremento';
 "+"              return 'suma';
 "-"              return 'resta';
 "*"              return 'multiplicacion';
@@ -48,6 +50,8 @@ var numeroLinea = 1;
 "<"             return 'op_menor';
 ">"             return 'op_mayor';
 /* falta operador ternario */
+":"             return 'dos_puntos';
+"?"             return 'pregunta_cierra';
 /*  operadores logicos*/
 "||"            return 'op_or';
 "&&"            return 'op_and';
@@ -77,14 +81,17 @@ var numeroLinea = 1;
 
 /lex 
 /* precedencia*/
+%left 'pregunta_cierra''dos_puntos'
 %left 'op_or'
 %left 'op_and'
 %left 'op_not'
 %left 'op_doble_igual' 'op_diferencia' 'op_menor' 'op_menor_igual' 'op_mayor' 'op_mayor_igual'
 %left 'suma' 'resta'
-%left 'multiplicacion' 'division'
-%left 'potencia' 'op_modulo'
+%left 'multiplicacion' 'division' 'op_modulo'
+%left 'def_boolean' 'def_entero' 'def_decimal' 'def_cadena' 'def_caracter' 'incremento' 'decremento'
+%left 'potencia' 
 %left UNMENOS
+%left 'par_abre' 'par_cierra'
 //%left negado
 
 %start INICIAL
@@ -112,31 +119,37 @@ DECLARACION: TIPO_DATO identificador {$$ = new S.simbolo($1.getTipoDato(),$1.get
 ASIGNACION: identificador op_igual EXPRESION {controllador.Grammar.consola += $3.getNombreSimbolo() +" vale: "+ $3.simbol.getValor()+"\n"}
         |TIPO_DATO identificador op_igual EXPRESION {controllador.Grammar.consola += $4.getNombreSimbolo() +" vale: "+ $4.simbol.getValor()+"\n"};
 
-EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExpresion.multiplicacion,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
-            |EXPRESION suma EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.suma,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
-            |EXPRESION resta EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.resta,numeroLinea,@2.first_column,null,null); $$.ejecutar()}           
-            |EXPRESION multiplicacion EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.multiplicacion,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
-            |EXPRESION division EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.division,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
-            |EXPRESION potencia EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.potencia,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
-            |EXPRESION op_modulo EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.modulo,numeroLinea,@2.first_column,null,null); $$.ejecutar()}
+EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExpresion.multiplicacion,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar()}
+            |par_abre TIPO_DATO par_cierra  EXPRESION{$$ = new E.expresion(null,$4,E.tipoExpresion.casteo,numeroLinea,@2.first_column,null,null,null,$2); $$.ejecutar()}
+            |EXPRESION suma EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.suma,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar()}
+            |EXPRESION resta EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.resta,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar()}           
+            |EXPRESION multiplicacion EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.multiplicacion,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar()}
+            |EXPRESION division EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.division,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar()}
+            |EXPRESION potencia EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.potencia,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar()}
+            |EXPRESION op_modulo EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.modulo,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar()}
             |par_abre EXPRESION par_cierra {$$ = $2}
-            |EXPRESION op_and EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.and,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |EXPRESION op_or EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.or,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |op_not EXPRESION{$$ = new E.expresion(null,$2,E.tipoExpresion.not,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |EXPRESION op_mayor EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.mayor_que,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |EXPRESION op_menor EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.menor_que,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |EXPRESION op_mayor_igual EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.mayor_igual_que,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |EXPRESION op_menor_igual EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.menor_igual_que,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |EXPRESION op_doble_igual EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.igualdad,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |EXPRESION op_diferencia EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.diferencia,numeroLinea,@2.first_column,null,null); $$.ejecutar();}
-            |DATO { controllador.Grammar.consola += $$.getNombreSimbolo() +" vale: "+ $$.simbol.getValor()+" "+$$.noFila+" "+$$.noColumna + "\n";};     
+            |EXPRESION op_and EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.and,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |EXPRESION op_or EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.or,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |op_not EXPRESION{$$ = new E.expresion(null,$2,E.tipoExpresion.not,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |EXPRESION op_mayor EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.mayor_que,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |EXPRESION op_menor EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.menor_que,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |EXPRESION op_mayor_igual EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.mayor_igual_que,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |EXPRESION op_menor_igual EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.menor_igual_que,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |EXPRESION op_doble_igual EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.igualdad,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |EXPRESION op_diferencia EXPRESION{$$ = new E.expresion($3,$1,E.tipoExpresion.diferencia,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |EXPRESION pregunta_cierra EXPRESION dos_puntos EXPRESION {$$ = new E.expresion($5,$3,E.tipoExpresion.ternario,numeroLinea,@2.first_column,null,null,$1,null); $$.ejecutar();}
+            |EXPRESION incremento {$$ = new E.expresion(null,$1,E.tipoExpresion.incremento,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |EXPRESION decremento{$$ = new E.expresion(null,$1,E.tipoExpresion.decremento,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
+            |DATO { };     
 
-DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.decimal,String($1));}
-        |entero    {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.entero,String($1));}
-        |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1));}
-        |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1));}
-        |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,numeroLinea,@1.first_column,S.tipoDatos.cadena,String($1).slice(1,-1));}
-        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,numeroLinea,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1));};
+
+
+DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.decimal,String($1),null);}
+        |entero    {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.entero,String($1),null);}
+        |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1),null);}
+        |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1),null);}
+        |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,numeroLinea,@1.first_column,S.tipoDatos.cadena,String($1).slice(1,-1),null);}
+        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,numeroLinea,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1),null);};
 
 TIPO_DATO: def_entero {$$ = new S.simbolo(S.tipoDatos.entero,null);}
             |def_decimal{$$ = new S.simbolo(S.tipoDatos.decimal,null);}

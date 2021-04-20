@@ -696,4 +696,23 @@ export class OpeRelacionales {
         } else return 0;
     }
     
+    // no relacional pero por espacio va a ir aca
+    /**
+     * operadorTernario implementado para regresa un simbolo
+    */
+    public operadorTernario(derecho:expresion|null,izquierdo:expresion|null,condicion:expresion|null):simbolo {
+        if (derecho == null||izquierdo==null||condicion==null) {
+            return new simbolo(tipoDatos.error,null)
+        }else if(condicion.simbol.tipo!=tipoDatos.booleano){
+            return new simbolo(tipoDatos.error,null)
+        }else{
+            if (condicion.simbol.getValor()=="true") {
+                return new simbolo(izquierdo.simbol.tipo,izquierdo.simbol.getValor())
+            }else{
+                return new simbolo(derecho.simbol.tipo,derecho.simbol.getValor())
+            }
+        }
+        return new simbolo(tipoDatos.error,null)
+    }
 }
+

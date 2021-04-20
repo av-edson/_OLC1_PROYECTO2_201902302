@@ -3,16 +3,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.tipoExpresion = exports.expresion = void 0;
 const simbolos_1 = require("../Enviroment/simbolos");
 const expRelacionales_1 = require("./expRelacionales");
+const expresionCasteo_1 = require("./expresionCasteo");
 class expresion {
-    constructor(derecho, izquierdo, tipo, fila, columna, tipoDato, valor) {
+    constructor(derecho, izquierdo, tipo, fila, columna, tipoDato, valor, ternario, casteo) {
         this.derecho = derecho;
         this.izquierdo = izquierdo;
+        this.ternario = ternario;
+        this.casteo = casteo;
         this.tipo = tipo;
         this.noFila = fila;
         this.noColumna = columna;
         this.simbol = new simbolos_1.simbolo(tipoDato, valor === null || valor === void 0 ? void 0 : valor.toString().toLowerCase());
     }
     ejecutar() {
+        var cast = new expresionCasteo_1.Casteo();
         var simboloDerecho = new simbolos_1.simbolo(null, null);
         var simboloIzquierdo = new simbolos_1.simbolo(null, null);
         // ------------------------
@@ -63,6 +67,19 @@ class expresion {
                 break;
             case tipoExpresion.not:
                 this.simbol = this.operacionLogica(null, this.izquierdo, 3);
+                break;
+            case tipoExpresion.ternario:
+                let op = new expRelacionales_1.OpeRelacionales();
+                this.simbol = op.operadorTernario(this.derecho, this.izquierdo, this.ternario);
+                break;
+            case tipoExpresion.casteo:
+                this.simbol = cast.castear(this.izquierdo, this.casteo);
+                break;
+            case tipoExpresion.incremento:
+                this.simbol = cast.incremento(this.izquierdo);
+                break;
+            case tipoExpresion.decremento:
+                this.simbol = cast.decremento(this.izquierdo);
                 break;
             case tipoExpresion.numero:
                 return Number(this.simbol.getValor());
@@ -634,11 +651,15 @@ var tipoExpresion;
     tipoExpresion[tipoExpresion["and"] = 12] = "and";
     tipoExpresion[tipoExpresion["or"] = 13] = "or";
     tipoExpresion[tipoExpresion["not"] = 14] = "not";
-    tipoExpresion[tipoExpresion["numero"] = 15] = "numero";
-    tipoExpresion[tipoExpresion["identificador"] = 16] = "identificador";
-    tipoExpresion[tipoExpresion["booleano"] = 17] = "booleano";
-    tipoExpresion[tipoExpresion["cadena"] = 18] = "cadena";
-    tipoExpresion[tipoExpresion["caracter"] = 19] = "caracter";
-    tipoExpresion[tipoExpresion["funcion"] = 20] = "funcion";
-    tipoExpresion[tipoExpresion["nulo"] = 21] = "nulo";
+    tipoExpresion[tipoExpresion["ternario"] = 15] = "ternario";
+    tipoExpresion[tipoExpresion["casteo"] = 16] = "casteo";
+    tipoExpresion[tipoExpresion["incremento"] = 17] = "incremento";
+    tipoExpresion[tipoExpresion["decremento"] = 18] = "decremento";
+    tipoExpresion[tipoExpresion["numero"] = 19] = "numero";
+    tipoExpresion[tipoExpresion["identificador"] = 20] = "identificador";
+    tipoExpresion[tipoExpresion["booleano"] = 21] = "booleano";
+    tipoExpresion[tipoExpresion["cadena"] = 22] = "cadena";
+    tipoExpresion[tipoExpresion["caracter"] = 23] = "caracter";
+    tipoExpresion[tipoExpresion["funcion"] = 24] = "funcion";
+    tipoExpresion[tipoExpresion["nulo"] = 25] = "nulo";
 })(tipoExpresion = exports.tipoExpresion || (exports.tipoExpresion = {}));

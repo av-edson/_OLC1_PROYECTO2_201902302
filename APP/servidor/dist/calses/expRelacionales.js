@@ -778,5 +778,26 @@ class OpeRelacionales {
         else
             return 0;
     }
+    // no relacional pero por espacio va a ir aca
+    /**
+     * operadorTernario implementado para regresa un simbolo
+    */
+    operadorTernario(derecho, izquierdo, condicion) {
+        if (derecho == null || izquierdo == null || condicion == null) {
+            return new simbolos_1.simbolo(simbolos_1.tipoDatos.error, null);
+        }
+        else if (condicion.simbol.tipo != simbolos_1.tipoDatos.booleano) {
+            return new simbolos_1.simbolo(simbolos_1.tipoDatos.error, null);
+        }
+        else {
+            if (condicion.simbol.getValor() == "true") {
+                return new simbolos_1.simbolo(izquierdo.simbol.tipo, izquierdo.simbol.getValor());
+            }
+            else {
+                return new simbolos_1.simbolo(derecho.simbol.tipo, derecho.simbol.getValor());
+            }
+        }
+        return new simbolos_1.simbolo(simbolos_1.tipoDatos.error, null);
+    }
 }
 exports.OpeRelacionales = OpeRelacionales;

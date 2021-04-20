@@ -2,19 +2,24 @@ import { Ambiente } from "../Enviroment/enviroment";
 import { instruccion } from "../Enviroment/instruccion";
 import { simbolo,tipoDatos } from "../Enviroment/simbolos";
 import {OpeRelacionales} from "./expRelacionales"
+import {Casteo} from "./expresionCasteo"
 
 export class expresion implements instruccion{
 
     derecho:expresion|null;
     izquierdo:expresion|null;
+    ternario:expresion|null;
+    casteo:simbolo|null;
     tipo:tipoExpresion;
     noFila:number;
     noColumna:number;
     simbol:simbolo;
 
-    constructor(derecho:expresion,izquierdo:expresion,tipo:tipoExpresion,fila:number,columna:number,tipoDato:tipoDatos,valor:string|null) {
+    constructor(derecho:expresion,izquierdo:expresion,tipo:tipoExpresion,fila:number,columna:number,tipoDato:tipoDatos,valor:string|null,ternario:expresion,casteo:simbolo|null) {
         this.derecho = derecho;
         this.izquierdo = izquierdo;
+        this.ternario = ternario
+        this.casteo=casteo;
         this.tipo=tipo;
         this.noFila=fila;
         this.noColumna=columna;
@@ -23,6 +28,7 @@ export class expresion implements instruccion{
 
 
     ejecutar(){
+        var cast = new Casteo();
         var simboloDerecho = new simbolo(null,null);
         var simboloIzquierdo = new simbolo(null,null);
         // ------------------------
@@ -73,6 +79,19 @@ export class expresion implements instruccion{
                 break;
             case tipoExpresion.not:
                 this.simbol = this.operacionLogica(null,this.izquierdo,3);
+                break;
+            case tipoExpresion.ternario:
+                let op = new OpeRelacionales();
+                this.simbol =op.operadorTernario(this.derecho,this.izquierdo,this.ternario);
+                break;
+            case tipoExpresion.casteo:
+                this.simbol=cast.castear(this.izquierdo,this.casteo)
+                break;
+            case tipoExpresion.incremento:
+                this.simbol=cast.incremento(this.izquierdo)
+                break;
+            case tipoExpresion.decremento:
+                this.simbol=cast.decremento(this.izquierdo)
                 break;
             case tipoExpresion.numero:
                 return Number(this.simbol.getValor())
@@ -598,6 +617,8 @@ export class expresion implements instruccion{
     }
 }
 
+
+
 export enum tipoExpresion{
     suma,
     resta,
@@ -614,6 +635,10 @@ export enum tipoExpresion{
     and,
     or,
     not,
+    ternario,
+    casteo,
+    incremento,
+    decremento,
     numero,
     identificador,
     booleano,
