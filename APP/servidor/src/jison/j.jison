@@ -13,7 +13,7 @@ const Dec = require("./calses/Declaracion")
 var err;
 var simAux;
 var ambAux = controllador.Grammar.ambienteGlobal
-var numeroLinea = controllador.noLinea;
+var numeroLinea = controllador.Grammar.noLinea;
 %}
 %lex 
 %options case-insensitive
@@ -156,7 +156,8 @@ DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLin
         |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1),null,null);}
         |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1),null,null);}
         |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,numeroLinea,@1.first_column,S.tipoDatos.cadena,String($1).slice(1,-1),null,null);}
-        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,numeroLinea,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1),null,null);};
+        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,numeroLinea,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1),null,null);}
+        |identificador{$$=new E.expresion(null,null,E.tipoExpresion.identificador,numeroLinea,@1.first_column,null,String($1),null,null)};
 
 TIPO_DATO: def_entero {$$ = new S.simbolo(S.tipoDatos.entero,null);}
             |def_decimal{$$ = new S.simbolo(S.tipoDatos.decimal,null);}

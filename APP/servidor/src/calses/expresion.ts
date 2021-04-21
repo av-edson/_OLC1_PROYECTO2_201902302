@@ -1,4 +1,4 @@
-import { Ambiente } from "../Enviroment/enviroment";
+import { Ambiente,Nodo } from "../Enviroment/enviroment";
 import { instruccion } from "../Enviroment/instruccion";
 import { simbolo,tipoDatos } from "../Enviroment/simbolos";
 import {OpeRelacionales} from "./expRelacionales"
@@ -17,7 +17,7 @@ export class expresion implements instruccion{
     noColumna:number;
     simbol:simbolo;
 
-    constructor(derecho:expresion,izquierdo:expresion,tipo:tipoExpresion,fila:number,columna:number,tipoDato:tipoDatos,valor:string|null,ternario:expresion,casteo:simbolo|null) {
+    constructor(derecho:expresion|null,izquierdo:expresion|null,tipo:tipoExpresion,fila:number,columna:number,tipoDato:tipoDatos|null,valor:string|null,ternario:expresion|null,casteo:simbolo|null) {
         this.derecho = derecho;
         this.izquierdo = izquierdo;
         this.ternario = ternario
@@ -26,74 +26,111 @@ export class expresion implements instruccion{
         this.noFila=fila;
         this.noColumna=columna;
         this.simbol = new simbolo(tipoDato,valor?.toString().toLowerCase());
+        // ver si es identificador y buscar el simbolo para agregarlo
+        if (tipo==tipoExpresion.identificador && valor != null) {
+            let variable:Nodo = Grammar.ambienteGlobal.buscarEnTabla(valor,this.noFila,this.noColumna);
+            if (variable==null) {
+                this.simbol.tipo = tipoDatos.error
+            }else{
+                switch (variable.tipo_dato) {
+                    case 0:
+                        this.simbol = new simbolo(tipoDatos.entero,variable.valor)
+                        break;
+                    case 1:
+                        this.simbol = new simbolo(tipoDatos.decimal,variable.valor)
+                        break;
+                    case 2:
+                        this.simbol = new simbolo(tipoDatos.cadena,variable.valor)
+                        break;
+                    case 3:
+                        this.simbol = new simbolo(tipoDatos.caracter,variable.valor)
+                        break;
+                    case 4:
+                        this.simbol = new simbolo(tipoDatos.booleano,variable.valor)
+                        break;
+                    case 6:
+                        this.simbol = new simbolo(tipoDatos.booleano,variable.valor)
+                        break;
+                }
+            }
+        }
     }
 
 
     ejecutar(){
         var cast = new Casteo();
-        var simboloDerecho = new simbolo(null,null);
-        var simboloIzquierdo = new simbolo(null,null);
+        var simboloDerecho = this.derecho;
+        var simboloIzquierdo = this.izquierdo;
+        var teneario;var casteo;
         // ------------------------
         // !!ver si el derechio o izquierdo es variable y hacer validaciones
         // ----------------------
+        if (simboloDerecho != null &&simboloDerecho.tipo == tipoExpresion.identificador ) {
+            console.log(simboloDerecho)
+            
+        }
+        if (simboloIzquierdo?.tipo == tipoExpresion.identificador) {
+            
+        }
+
         switch (this.tipo) {
             case tipoExpresion.suma:
-                this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,1);
+                this.simbol = this.operacionAritmetica(simboloDerecho,simboloIzquierdo,1);
                 break;
             case tipoExpresion.resta:
-                this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,2);
+                this.simbol = this.operacionAritmetica(simboloDerecho,simboloIzquierdo,2);
             break;
             case tipoExpresion.multiplicacion:
-                this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,3);
+                this.simbol = this.operacionAritmetica(simboloDerecho,simboloIzquierdo,3);
                 break;
             case tipoExpresion.division:
-                this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,4);
+                this.simbol = this.operacionAritmetica(simboloDerecho,simboloIzquierdo,4);
                 break;
             case tipoExpresion.potencia:
-                this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,5);
+                this.simbol = this.operacionAritmetica(simboloDerecho,simboloIzquierdo,5);
                 break;
             case tipoExpresion.modulo:
-                this.simbol = this.operacionAritmetica(this.derecho,this.izquierdo,6);
+                this.simbol = this.operacionAritmetica(simboloDerecho,simboloIzquierdo,6);
                 break;
             case tipoExpresion.mayor_que:
-                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,4);
+                this.simbol = this.operacionLogica(simboloDerecho,simboloIzquierdo,4);
                 break;
             case tipoExpresion.menor_que:
-                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,5);
+                this.simbol = this.operacionLogica(simboloDerecho,simboloIzquierdo,5);
                 break;
             case tipoExpresion.mayor_igual_que:
-                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,6);
+                this.simbol = this.operacionLogica(simboloDerecho,simboloIzquierdo,6);
                 break;
             case tipoExpresion.menor_igual_que:
-                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,7);
+                this.simbol = this.operacionLogica(simboloDerecho,simboloIzquierdo,7);
                 break;
             case tipoExpresion.igualdad:
-                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,8);
+                this.simbol = this.operacionLogica(simboloDerecho,simboloIzquierdo,8);
                 break;
             case tipoExpresion.diferencia:
-                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,9);
+                this.simbol = this.operacionLogica(simboloDerecho,simboloIzquierdo,9);
                 break;
             case tipoExpresion.and:
-                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,1);
+                this.simbol = this.operacionLogica(simboloDerecho,simboloIzquierdo,1);
                 break;
             case tipoExpresion.or:
-                this.simbol = this.operacionLogica(this.derecho,this.izquierdo,2);
+                this.simbol = this.operacionLogica(simboloDerecho,simboloIzquierdo,2);
                 break;
             case tipoExpresion.not:
-                this.simbol = this.operacionLogica(null,this.izquierdo,3);
+                this.simbol = this.operacionLogica(simboloDerecho,simboloIzquierdo,3);
                 break;
             case tipoExpresion.ternario:
                 let op = new OpeRelacionales();
-                this.simbol =op.operadorTernario(this.derecho,this.izquierdo,this.ternario);
+                this.simbol =op.operadorTernario(simboloDerecho,simboloIzquierdo,this.ternario);
                 break;
             case tipoExpresion.casteo:
-                this.simbol=cast.castear(this.izquierdo,this.casteo)
+                this.simbol=cast.castear(simboloIzquierdo,this.casteo)
                 break;
             case tipoExpresion.incremento:
-                this.simbol=cast.incremento(this.izquierdo)
+                this.simbol=cast.incremento(simboloIzquierdo)
                 break;
             case tipoExpresion.decremento:
-                this.simbol=cast.decremento(this.izquierdo)
+                this.simbol=cast.decremento(simboloIzquierdo)
                 break;
             case tipoExpresion.numero:
                 return Number(this.simbol.getValor())
