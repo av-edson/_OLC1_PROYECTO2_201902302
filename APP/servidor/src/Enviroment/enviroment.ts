@@ -1,10 +1,17 @@
+import { Declaracion } from "../calses/Declaracion";
+import { Error } from "../calses/error";
+import { expresion, tipoExpresion } from "../calses/expresion";
+import { Grammar } from "../controllers/Grammar";
 import { simbolo, tipoDatos } from "./simbolos";
+import {tablaSimbolosModel} from "../models/tabla-simbolos"
 export class Ambiente {
-    public tablaSimbolos:Array<encabezadoSimbolos>;
+    public tablaSimbolos:Nodo[];
     private ambientePadre:Ambiente|null;
-    constructor(padre:Ambiente|null) {
+    private nombreAmbiente:string;
+    constructor(padre:Ambiente|null, nombre:string) {
         this.tablaSimbolos=[];
         this.ambientePadre = padre;
+        this.nombreAmbiente=nombre;
     }
 
     public getAmbienteGlobal():Ambiente|null{
@@ -15,27 +22,83 @@ export class Ambiente {
         return aux;
     }
 
-    public buscarEnTabla(nombre:string,fila:number,columna:number):simbolo|null{
+    public getNombreAmbiente(){
+        return this.nombreAmbiente
+    }
+
+    public agregarSimbolo(agregado:Declaracion){
+        let aux:Nodo = new Nodo(agregado.tipo,agregado.fila,agregado.columna,new simbolo(agregado.tipoDato,agregado.valor),agregado.entorno,agregado.identificador)
+        this.tablaSimbolos.push(aux)
+    }
+
+    public buscarEnTabla(nombre:string,fila:number,columna:number):Nodo{
         nombre = nombre.toLowerCase();
-        var aux:Ambiente = this;
-        while(aux.ambientePadre != null){
-            this.tablaSimbolos.forEach(element => {
-                if (element.identificador == nombre && element.tipo_dato) {
-                    return new simbolo(element.tipo_dato,element.valor)
+        var aux:Ambiente|null = this;
+        while(aux != null){
+            for (let i = 0; i < aux.tablaSimbolos.length; i++) {
+                const element = aux.tablaSimbolos[i];
+                if (element.identificador == nombre) {
+                    return element
                 }
-            });
+            }
             aux = aux.ambientePadre;
         }
-        return null;
+        return new Nodo(tipoExpresion.nulo,fila,columna,new simbolo(tipoDatos.nulo,null),this,nombre);
+    }
+
+    public editarSimbolo(nombre:string,fila:number,columna:number, nuevo:expresion){
+        var temporal:Nodo = this.buscarEnTabla(nombre,fila,columna)
+        if (temporal.tipo_dato == nuevo.simbol.tipo) {
+            temporal.valor = nuevo.simbol.getValor()
+        }else{
+            Grammar.listaErrores.push(new Error("Error semantico","Error en la asignacion",temporal.linea,temporal.columna))
+            temporal.tipo_dato = tipoDatos.error
+        }
+    }
+
+    public getTablaSimbolos():Array<tablaSimbolosModel>{
+        var salida:Array<tablaSimbolosModel>=[];
+        this.tablaSimbolos.forEach(element => {
+            let aux:tablaSimbolosModel = {
+                identificador:String(element.identificador),
+                tipo:String(element.tipo),
+                tipo_dato:String(tipoDatos[Number(element.tipo_dato)]),
+                entorno:String(element.entorno.getNombreAmbiente()),
+                linea:String(element.linea),
+                columna:String(element.columna),
+                valor:String(element.valor)
+            }
+            salida.push(aux)
+        });
+        return salida;
     }
 }
 
 interface encabezadoSimbolos{
     identificador:string,
     tipo:string,
-    tipo_dato:tipoDatos,
-    entorno:string,
+    tipo_dato:tipoDatos|null,
+    entorno:Ambiente,
     linea:number,
     columna:number,
     valor:any|null
+}
+
+export class Nodo implements encabezadoSimbolos{
+    identificador: string;
+    tipo: string;
+    tipo_dato: tipoDatos|null;
+    entorno: Ambiente;
+    linea: number;
+    columna: number;
+    valor: any;
+    constructor(tipo:tipoExpresion,fila:number,columna:number,sim:simbolo,entorno:Ambiente,identificador:string){
+        this.tipo = tipoExpresion[tipo];
+        this.linea = fila;
+        this.columna =columna;
+        this.tipo_dato=sim.tipo;
+        this.entorno=entorno;
+        this.valor=sim.getValor();
+        this.identificador=identificador;
+    }
 }

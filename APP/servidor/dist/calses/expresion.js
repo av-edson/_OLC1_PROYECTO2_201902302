@@ -4,6 +4,8 @@ exports.tipoExpresion = exports.expresion = void 0;
 const simbolos_1 = require("../Enviroment/simbolos");
 const expRelacionales_1 = require("./expRelacionales");
 const expresionCasteo_1 = require("./expresionCasteo");
+const Grammar_1 = require("../controllers/Grammar");
+const error_1 = require("../calses/error");
 class expresion {
     constructor(derecho, izquierdo, tipo, fila, columna, tipoDato, valor, ternario, casteo) {
         this.derecho = derecho;
@@ -99,7 +101,8 @@ class expresion {
                 break;
         }
         if (this.simbol.tipo == simbolos_1.tipoDatos.error) {
-            this.simbol.valor = "Error semantico en la operacion " + this.getOperacion();
+            this.simbol.valor = "Error semantico en la operacion " + this.getOperacion() + " linea " + this.getLine() + " ,columna " + this.getColumn();
+            Grammar_1.Grammar.listaErrores.push(new error_1.Error("Error Semantico", "Error en la operacion " + this.getOperacion(), this.noFila, this.noColumna));
         }
     }
     getColumn() {

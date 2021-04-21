@@ -6,10 +6,14 @@ const controllador = require("./controllers/Grammar")
 //import {expresion} from "../calses/expresion"
 const E = require("./calses/expresion")
 const Err = require("./calses/error")
+const Amb = require("./Enviroment/enviroment")
 const S = require("./Enviroment/simbolos")
 const I = require("./Enviroment/instruccion")
+const Dec = require("./calses/Declaracion")
 var err;
-var numeroLinea = 1;
+var simAux;
+var ambAux = controllador.Grammar.ambienteGlobal
+var numeroLinea = controllador.noLinea;
 %}
 %lex 
 %options case-insensitive
@@ -106,18 +110,21 @@ INSTRUCCIONES: INSTRUCCIONES INSTRUCCION
 
 BLOQUE_SENTENCIAS: llave_abre INSTRUCCIONES llave_cierra;
 
-INSTRUCCION: ASIGNACION punto_coma{controllador.Grammar.listaInstrucciones.push($1);}
-            |DECLARACION punto_coma{controllador.Grammar.consola +=$$.printInfo()+"\n";controllador.Grammar.listaInstrucciones.push($1);}
+INSTRUCCION: ASIGNACION punto_coma{}
+            |DECLARACION punto_coma{ambAux.agregarSimbolo($1);}
             |LLAMADA_FUNCION
             |SENTENCIA_CONTROL 
             |ASIGNACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);}
             |DECLARACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);}
             | error punto_coma { err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);};
 
-DECLARACION: TIPO_DATO identificador {$$ = new S.simbolo($1.getTipoDato(),$1.getValor());};
+DECLARACION: TIPO_DATO identificador { simAux = new S.simbolo($1.getTipoDato(),$1.getValor()); 
+$$ = new Dec.Declaracion(E.tipoExpresion.identificador,numeroLinea,@2.first_column,simAux.tipo,null,ambAux,$2,null)};
 
-ASIGNACION: identificador op_igual EXPRESION {controllador.Grammar.consola += $3.getNombreSimbolo() +" vale: "+ $3.simbol.getValor()+"\n"}
-        |TIPO_DATO identificador op_igual EXPRESION {controllador.Grammar.consola += $4.getNombreSimbolo() +" vale: "+ $4.simbol.getValor()+"\n"};
+ASIGNACION: identificador op_igual EXPRESION {ambAux.editarSimbolo($1,numeroLinea,@1.first_column,$3);}
+        |TIPO_DATO identificador op_igual EXPRESION {
+        $$ = new Dec.Declaracion(E.tipoExpresion.identificador,numeroLinea,@2.first_column,$1.tipo,$4.simbol.getValor(),ambAux,$2,$4);
+        ambAux.agregarSimbolo($$);};
 
 EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExpresion.multiplicacion,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar()}
             |par_abre TIPO_DATO par_cierra  EXPRESION{$$ = new E.expresion(null,$4,E.tipoExpresion.casteo,numeroLinea,@2.first_column,null,null,null,$2); $$.ejecutar()}
@@ -140,16 +147,16 @@ EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExp
             |EXPRESION pregunta_cierra EXPRESION dos_puntos EXPRESION {$$ = new E.expresion($5,$3,E.tipoExpresion.ternario,numeroLinea,@2.first_column,null,null,$1,null); $$.ejecutar();}
             |EXPRESION incremento {$$ = new E.expresion(null,$1,E.tipoExpresion.incremento,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
             |EXPRESION decremento{$$ = new E.expresion(null,$1,E.tipoExpresion.decremento,numeroLinea,@2.first_column,null,null,null,null); $$.ejecutar();}
-            |DATO { };     
+            |DATO {$$=$1 };     
 
 
 
-DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.decimal,String($1),null);}
-        |entero    {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.entero,String($1),null);}
-        |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1),null);}
-        |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1),null);}
-        |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,numeroLinea,@1.first_column,S.tipoDatos.cadena,String($1).slice(1,-1),null);}
-        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,numeroLinea,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1),null);};
+DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.decimal,String($1),null,null);}
+        |entero    {$$ = new E.expresion(null,null,E.tipoExpresion.numero,numeroLinea,@1.first_column,S.tipoDatos.entero,String($1),null,null);}
+        |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1),null,null);}
+        |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,numeroLinea,@1.first_column,S.tipoDatos.booleano,String($1),null,null);}
+        |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,numeroLinea,@1.first_column,S.tipoDatos.cadena,String($1).slice(1,-1),null,null);}
+        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,numeroLinea,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1),null,null);};
 
 TIPO_DATO: def_entero {$$ = new S.simbolo(S.tipoDatos.entero,null);}
             |def_decimal{$$ = new S.simbolo(S.tipoDatos.decimal,null);}

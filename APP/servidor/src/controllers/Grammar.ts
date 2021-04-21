@@ -1,12 +1,12 @@
+import { instruccion } from "../Enviroment/instruccion";
+import {Error} from "../calses/error"
+import { Ambiente } from "../Enviroment/enviroment";
 export  class Grammar{
     static consola:string="";
-    static listaInstrucciones = [];
-    static listaErrores = [];
+    static listaErrores: Array<Error>=[];
+    static ambienteGlobal:Ambiente=new Ambiente(null,"Global");
+    static noLinea=1;
     constructor(){
-        
-    }
-
-    static hola(){
-        console.log('hola mundo')
+        //Grammar.listaErrores.push(new Error("s","f",2,2))
     }
 }

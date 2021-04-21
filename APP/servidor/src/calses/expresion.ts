@@ -3,6 +3,8 @@ import { instruccion } from "../Enviroment/instruccion";
 import { simbolo,tipoDatos } from "../Enviroment/simbolos";
 import {OpeRelacionales} from "./expRelacionales"
 import {Casteo} from "./expresionCasteo"
+import {Grammar} from "../controllers/Grammar"
+import {Error}  from "../calses/error"
 
 export class expresion implements instruccion{
 
@@ -111,7 +113,8 @@ export class expresion implements instruccion{
                 break;
         }
         if (this.simbol.tipo==tipoDatos.error) {
-            this.simbol.valor = "Error semantico en la operacion "+this.getOperacion();
+            this.simbol.valor = "Error semantico en la operacion "+this.getOperacion()+" linea "+this.getLine()+" ,columna "+this.getColumn();
+            Grammar.listaErrores.push(new Error("Error Semantico","Error en la operacion "+this.getOperacion(),this.noFila,this.noColumna));
         }
     }
     getColumn():number{

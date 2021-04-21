@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { tablaSimbolosModel } from 'src/app/models/simbolos-model';
 import { VentanaService } from 'src/app/services/ventana.service';
 import { errorModel } from "../../models/error-model";
 
@@ -10,17 +11,18 @@ import { errorModel } from "../../models/error-model";
 export class SalidasComponent implements OnInit {
 
   @Input() listaErrores:Array<errorModel>=[];
-  index:number=0;
+  @Input() listaSimbolos:Array<tablaSimbolosModel>=[];
+
   constructor(public dataService:VentanaService) {
     //this.listaErrores = this.dataService.listaVentanas[this.dataService.ventanaActual].listaE;
    }
 
   ngOnInit(): void {
-    this.index = 0;
     this.listaErrores = this.dataService.listaVentanas[this.dataService.ventanaActual].listaE;
   }
 
   actualizar(){
     this.listaErrores = this.dataService.listaVentanas[this.dataService.ventanaActual].listaE;
+    this.listaSimbolos = this.dataService.listaVentanas[this.dataService.ventanaActual].listaSimbolos;
   }
 }

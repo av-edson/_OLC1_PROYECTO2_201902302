@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Grammar = void 0;
+const enviroment_1 = require("../Enviroment/enviroment");
 class Grammar {
     constructor() {
-    }
-    static hola() {
-        console.log('hola mundo');
+        //Grammar.listaErrores.push(new Error("s","f",2,2))
     }
 }
 exports.Grammar = Grammar;
 Grammar.consola = "";
-Grammar.listaInstrucciones = [];
 Grammar.listaErrores = [];
+Grammar.ambienteGlobal = new enviroment_1.Ambiente(null, "Global");
+Grammar.noLinea = 1;
