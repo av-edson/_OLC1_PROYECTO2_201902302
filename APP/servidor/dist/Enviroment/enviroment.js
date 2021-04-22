@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Nodo = exports.Ambiente = void 0;
+const Declaracion_1 = require("../calses/manejoVariables/Declaracion");
 const error_1 = require("../calses/error");
-const expresion_1 = require("../calses/expresion");
+const expresion_1 = require("../calses/expresiones/expresion");
 const Grammar_1 = require("../controllers/Grammar");
 const simbolos_1 = require("./simbolos");
 class Ambiente {
@@ -10,6 +11,11 @@ class Ambiente {
         this.tablaSimbolos = [];
         this.ambientePadre = padre;
         this.nombreAmbiente = nombre;
+        this.listaInstrucciones = [];
+    }
+    limpiarListas() {
+        this.tablaSimbolos = [];
+        this.listaInstrucciones = [];
     }
     getAmbienteGlobal() {
         var aux = this;
@@ -18,12 +24,37 @@ class Ambiente {
         }
         return aux;
     }
+    getPadre() {
+        return this.ambientePadre;
+    }
+    getListaInstrucciones() {
+        return this.listaInstrucciones;
+    }
     getNombreAmbiente() {
         return this.nombreAmbiente;
     }
+    agregarInstruccion(agregado) {
+        if (agregado instanceof Ambiente) {
+            agregado.listaInstrucciones.forEach(element => {
+                this.agregarInstruccion(element);
+            });
+        }
+        else {
+            this.listaInstrucciones.push(agregado);
+        }
+    }
     agregarSimbolo(agregado) {
-        let aux = new Nodo(agregado.tipo, agregado.fila, agregado.columna, new simbolos_1.simbolo(agregado.tipoDato, agregado.valor), agregado.entorno, agregado.identificador);
-        this.tablaSimbolos.push(aux);
+        if (agregado instanceof Declaracion_1.Declaracion) {
+            let aux = new Nodo(agregado.tipo, agregado.fila, agregado.columna, new simbolos_1.simbolo(agregado.tipoDato, agregado.valor), agregado.entorno, agregado.identificador);
+            this.tablaSimbolos.push(aux);
+        }
+    }
+    agregarHijos() {
+        this.tablaSimbolos.forEach(element => {
+            if (this.ambientePadre != null) {
+                this.ambientePadre.tablaSimbolos.push(element);
+            }
+        });
     }
     buscarEnTabla(nombre, fila, columna) {
         nombre = nombre.toLowerCase();
@@ -33,6 +64,7 @@ class Ambiente {
                 const element = aux.tablaSimbolos[i];
                 if (element.identificador == nombre) {
                     return element;
+                    break;
                 }
             }
             aux = aux.ambientePadre;
@@ -46,6 +78,7 @@ class Ambiente {
         }
         else {
             Grammar_1.Grammar.listaErrores.push(new error_1.Error("Error semantico", "Error en la asignacion", temporal.linea, temporal.columna));
+            Grammar_1.Grammar.consola += " ->Error semantico en asignacion linea: " + temporal.linea + " columna: " + temporal.columna + "\n";
             temporal.tipo_dato = simbolos_1.tipoDatos.error;
         }
     }
@@ -64,6 +97,13 @@ class Ambiente {
             salida.push(aux);
         });
         return salida;
+    }
+    ejecutarAmbiente() {
+        this.listaInstrucciones.forEach(element => {
+            if (!(element instanceof Ambiente)) {
+                element.ejecutar(null);
+            }
+        });
     }
 }
 exports.Ambiente = Ambiente;

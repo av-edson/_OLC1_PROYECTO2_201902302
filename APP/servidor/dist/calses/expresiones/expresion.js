@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tipoExpresion = exports.expresion = void 0;
-const simbolos_1 = require("../Enviroment/simbolos");
+const simbolos_1 = require("../../Enviroment/simbolos");
 const expRelacionales_1 = require("./expRelacionales");
 const expresionCasteo_1 = require("./expresionCasteo");
-const Grammar_1 = require("../controllers/Grammar");
-const error_1 = require("../calses/error");
+const Grammar_1 = require("../../controllers/Grammar");
+const error_1 = require("../error");
 class expresion {
-    constructor(derecho, izquierdo, tipo, fila, columna, tipoDato, valor, ternario, casteo) {
+    constructor(derecho, izquierdo, tipo, fila, columna, tipoDato, valor, ternario, casteo, ambiente) {
         this.derecho = derecho;
         this.izquierdo = izquierdo;
         this.ternario = ternario;
@@ -15,50 +15,84 @@ class expresion {
         this.tipo = tipo;
         this.noFila = fila;
         this.noColumna = columna;
+        this.ambiente = ambiente;
         this.simbol = new simbolos_1.simbolo(tipoDato, valor === null || valor === void 0 ? void 0 : valor.toString().toLowerCase());
         // ver si es identificador y buscar el simbolo para agregarlo
         if (tipo == tipoExpresion.identificador && valor != null) {
-            let variable = Grammar_1.Grammar.ambienteGlobal.buscarEnTabla(valor, this.noFila, this.noColumna);
-            if (variable == null) {
-                this.simbol.tipo = simbolos_1.tipoDatos.error;
-            }
-            else {
-                switch (variable.tipo_dato) {
-                    case 0:
-                        this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.entero, variable.valor);
-                        break;
-                    case 1:
-                        this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.decimal, variable.valor);
-                        break;
-                    case 2:
-                        this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.cadena, variable.valor);
-                        break;
-                    case 3:
-                        this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.caracter, variable.valor);
-                        break;
-                    case 4:
-                        this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.booleano, variable.valor);
-                        break;
-                    case 6:
-                        this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.booleano, variable.valor);
-                        break;
+            if (this.ambiente != null) {
+                let variable = this.ambiente.buscarEnTabla(valor, this.noFila, this.noColumna);
+                if (variable == null) {
+                    let padre = this.ambiente.getPadre();
+                    if (padre != null) {
+                        variable = padre.buscarEnTabla(valor, this.noFila, this.noColumna);
+                        if (variable == null) {
+                            this.simbol.tipo = simbolos_1.tipoDatos.error;
+                        }
+                        else {
+                            this.setTipoSimbolo(variable, this.simbol.getValor());
+                        }
+                    }
+                    else {
+                        this.simbol.tipo = simbolos_1.tipoDatos.error;
+                    }
+                }
+                else {
+                    this.setTipoSimbolo(variable, this.simbol.getValor());
                 }
             }
         }
     }
+    setTipoSimbolo(variable, valor) {
+        switch (variable.tipo_dato) {
+            case 0:
+                this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.entero, valor);
+                break;
+            case 1:
+                this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.decimal, valor);
+                break;
+            case 2:
+                this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.cadena, valor);
+                break;
+            case 3:
+                this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.caracter, valor);
+                break;
+            case 4:
+                this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.booleano, valor);
+                break;
+            case 6:
+                this.simbol = new simbolos_1.simbolo(simbolos_1.tipoDatos.booleano, valor);
+                break;
+        }
+    }
     ejecutar() {
-        var cast = new expresionCasteo_1.Casteo();
-        var simboloDerecho = this.derecho;
-        var simboloIzquierdo = this.izquierdo;
-        var teneario;
+        var _a;
+        if (this.izquierdo != null) {
+            this.izquierdo.ejecutar();
+        }
+        if (this.derecho != null) {
+            this.derecho.ejecutar();
+        }
+        let cast = new expresionCasteo_1.Casteo();
+        let simboloDerecho = this.derecho;
+        let simboloIzquierdo = this.izquierdo;
+        var nombreVariable = "";
+        var teneario = "";
         var casteo;
+        var izq = "";
+        var der = "";
         // ------------------------
         // !!ver si el derechio o izquierdo es variable y hacer validaciones
         // ----------------------
         if (simboloDerecho != null && simboloDerecho.tipo == tipoExpresion.identificador) {
-            console.log(simboloDerecho);
+            let variable = this.ambiente.buscarEnTabla(simboloDerecho.simbol.getValor(), simboloDerecho.noFila, simboloDerecho.noColumna);
+            simboloDerecho.simbol = new simbolos_1.simbolo(variable.tipo_dato, variable.valor);
+            der = variable.identificador;
         }
-        if ((simboloIzquierdo === null || simboloIzquierdo === void 0 ? void 0 : simboloIzquierdo.tipo) == tipoExpresion.identificador) {
+        if (simboloIzquierdo != null && simboloIzquierdo.tipo == tipoExpresion.identificador) {
+            //simboloIzquierdo.ejecutar()
+            let variable = this.ambiente.buscarEnTabla(simboloIzquierdo.simbol.getValor(), simboloIzquierdo.noFila, simboloIzquierdo.noColumna);
+            simboloIzquierdo.simbol = new simbolos_1.simbolo(variable.tipo_dato, variable.valor);
+            izq = variable.identificador;
         }
         switch (this.tipo) {
             case tipoExpresion.suma:
@@ -108,6 +142,7 @@ class expresion {
                 break;
             case tipoExpresion.ternario:
                 let op = new expRelacionales_1.OpeRelacionales();
+                (_a = this.ternario) === null || _a === void 0 ? void 0 : _a.ejecutar();
                 this.simbol = op.operadorTernario(simboloDerecho, simboloIzquierdo, this.ternario);
                 break;
             case tipoExpresion.casteo:
@@ -136,6 +171,16 @@ class expresion {
             case tipoExpresion.nulo:
                 break;
         }
+        if (simboloDerecho != null && simboloDerecho.tipo == tipoExpresion.identificador) {
+            if (this.tipo == tipoExpresion.incremento) {
+                this.ambiente.editarSimbolo(der, this.noFila, this.noColumna, this);
+            }
+        }
+        if (this.izquierdo != null && this.izquierdo.tipo == tipoExpresion.identificador) {
+            if (this.tipo == tipoExpresion.incremento) {
+                this.ambiente.editarSimbolo(izq, this.noFila, this.noColumna, this);
+            }
+        }
         if (this.simbol.tipo == simbolos_1.tipoDatos.error) {
             this.simbol.valor = "Error semantico en la operacion " + this.getOperacion() + " linea " + this.getLine() + " ,columna " + this.getColumn();
             Grammar_1.Grammar.consola += "->" + this.simbol.valor + "\n";
@@ -150,6 +195,9 @@ class expresion {
     }
     operacionAritmetica(derecho, izquierdo, tipoOp) {
         var resultado = 0;
+        console.log(izquierdo);
+        console.log("---------------");
+        console.log(derecho);
         if (derecho != null && izquierdo != null) {
             try {
                 switch (tipoOp) {

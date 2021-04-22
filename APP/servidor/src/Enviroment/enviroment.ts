@@ -1,19 +1,27 @@
-import { Declaracion } from "../calses/Declaracion";
+import { Declaracion } from "../calses/manejoVariables/Declaracion";
 import { Error } from "../calses/error";
-import { expresion, tipoExpresion } from "../calses/expresion";
+import { expresion, tipoExpresion } from "../calses/expresiones/expresion";
 import { Grammar } from "../controllers/Grammar";
 import { simbolo, tipoDatos } from "./simbolos";
 import {tablaSimbolosModel} from "../models/tabla-simbolos"
+import { instruccion } from "./instruccion";
+import { IfSentence } from "../calses/sentenciasControl/sentenciaIF";
 export class Ambiente {
     public tablaSimbolos:Nodo[];
     private ambientePadre:Ambiente|null;
+    private listaInstrucciones:Array<Ambiente|instruccion>;
     private nombreAmbiente:string;
     constructor(padre:Ambiente|null, nombre:string) {
         this.tablaSimbolos=[];
         this.ambientePadre = padre;
         this.nombreAmbiente=nombre;
+        this.listaInstrucciones = []
     }
 
+    public limpiarListas(){
+        this.tablaSimbolos = []
+        this.listaInstrucciones = []
+    }
     public getAmbienteGlobal():Ambiente|null{
         var aux:Ambiente = this;
         while(aux.ambientePadre != null){
@@ -22,13 +30,41 @@ export class Ambiente {
         return aux;
     }
 
+    public getPadre(){
+        return this.ambientePadre
+    }
+
+    public getListaInstrucciones(){
+        return this.listaInstrucciones
+    }
+
     public getNombreAmbiente(){
         return this.nombreAmbiente
     }
 
+    public agregarInstruccion(agregado:Ambiente|instruccion){
+        if (agregado instanceof Ambiente) {
+            agregado.listaInstrucciones.forEach(element => {
+                this.agregarInstruccion(element)
+            });
+        }else{
+            this.listaInstrucciones.push(agregado)
+        }
+        
+    }
     public agregarSimbolo(agregado:Declaracion){
-        let aux:Nodo = new Nodo(agregado.tipo,agregado.fila,agregado.columna,new simbolo(agregado.tipoDato,agregado.valor),agregado.entorno,agregado.identificador)
-        this.tablaSimbolos.push(aux)
+        if (agregado instanceof Declaracion) {
+            let aux:Nodo = new Nodo(agregado.tipo,agregado.fila,agregado.columna,new simbolo(agregado.tipoDato,agregado.valor),agregado.entorno,agregado.identificador)
+            this.tablaSimbolos.push(aux)
+        }
+    }
+
+    public agregarHijos(){
+        this.tablaSimbolos.forEach(element => {
+            if (this.ambientePadre != null) {
+                this.ambientePadre.tablaSimbolos.push(element)
+            }
+        });
     }
 
     public buscarEnTabla(nombre:string,fila:number,columna:number):Nodo{
@@ -39,6 +75,7 @@ export class Ambiente {
                 const element = aux.tablaSimbolos[i];
                 if (element.identificador == nombre) {
                     return element
+                    break  
                 }
             }
             aux = aux.ambientePadre;
@@ -47,14 +84,15 @@ export class Ambiente {
     }
 
     public editarSimbolo(nombre:string,fila:number,columna:number, nuevo:expresion){
-        var temporal:Nodo = this.buscarEnTabla(nombre,fila,columna)
+        var temporal = this.buscarEnTabla(nombre,fila,columna)
         if (temporal.tipo_dato == nuevo.simbol.tipo) {
             temporal.valor = nuevo.simbol.getValor()
         }else{
             Grammar.listaErrores.push(new Error("Error semantico","Error en la asignacion",temporal.linea,temporal.columna))
+            Grammar.consola+= " ->Error semantico en asignacion linea: "+temporal.linea+" columna: "+temporal.columna+"\n";
             temporal.tipo_dato = tipoDatos.error
         }
-    }
+    } 
 
     public getTablaSimbolos():Array<tablaSimbolosModel>{
         var salida:Array<tablaSimbolosModel>=[];
@@ -71,6 +109,14 @@ export class Ambiente {
             salida.push(aux)
         });
         return salida;
+    }
+
+    public ejecutarAmbiente(){
+        this.listaInstrucciones.forEach(element => {
+           if (!(element instanceof Ambiente)) {
+                element.ejecutar(null)
+           }
+        });
     }
 }
 

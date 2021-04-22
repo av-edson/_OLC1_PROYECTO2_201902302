@@ -7,11 +7,12 @@ export const compilarEntrada = (req:Request, res:Response) => {
     var parser = require('../j.js')
     Grammar.consola = "";
     Grammar.listaErrores = [];
-    Grammar.ambienteGlobal.tablaSimbolos = []
-    Grammar.noLinea = 1
+    Grammar.ambienteGlobal.limpiarListas()
     parser.parse(conteido)
-    //console.log(Grammar.listaInstrucciones)
-    //console.log(Grammar.ambienteGlobal.tablaSimbolos)
+
+    //console.log(Grammar.ambienteGlobal.getListaInstrucciones())
+    //console.log(Grammar.ambienteGlobal)
+    Grammar.ambienteGlobal.ejecutarAmbiente()
     res.json({
         mensaje: Grammar.consola,
         errores: Grammar.listaErrores,

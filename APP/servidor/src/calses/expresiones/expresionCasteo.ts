@@ -1,7 +1,8 @@
-import { Ambiente } from "../Enviroment/enviroment";
-import { instruccion } from "../Enviroment/instruccion";
-import { simbolo,tipoDatos } from "../Enviroment/simbolos";
-import {expresion} from "./expresion"
+import { Grammar } from "../../controllers/Grammar";
+import { Ambiente } from "../../Enviroment/enviroment";
+import { instruccion } from "../../Enviroment/instruccion";
+import { simbolo,tipoDatos } from "../../Enviroment/simbolos";
+import {expresion, tipoExpresion} from "./expresion"
 
 export class Casteo {
     constructor() {}

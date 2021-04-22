@@ -11,4 +11,3 @@ exports.Grammar = Grammar;
 Grammar.consola = "";
 Grammar.listaErrores = [];
 Grammar.ambienteGlobal = new enviroment_1.Ambiente(null, "Global");
-Grammar.noLinea = 1;

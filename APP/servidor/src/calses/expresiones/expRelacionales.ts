@@ -1,6 +1,6 @@
-import { Ambiente } from "../Enviroment/enviroment";
-import { instruccion } from "../Enviroment/instruccion";
-import { simbolo,tipoDatos } from "../Enviroment/simbolos";
+import { Ambiente } from "../../Enviroment/enviroment";
+import { instruccion } from "../../Enviroment/instruccion";
+import { simbolo,tipoDatos } from "../../Enviroment/simbolos";
 import {expresion} from "./expresion"
 
 export class OpeRelacionales {

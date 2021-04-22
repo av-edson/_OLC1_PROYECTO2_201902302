@@ -5,8 +5,7 @@ export  class Grammar{
     static consola:string="";
     static listaErrores: Array<Error>=[];
     static ambienteGlobal:Ambiente=new Ambiente(null,"Global");
-    static noLinea=1;
     constructor(){
         //Grammar.listaErrores.push(new Error("s","f",2,2))
     }
-}
+} 

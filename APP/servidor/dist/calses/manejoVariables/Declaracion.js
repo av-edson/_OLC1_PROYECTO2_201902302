@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Declaracion = void 0;
-const simbolos_1 = require("../Enviroment/simbolos");
-const Grammar_1 = require("../controllers/Grammar");
-const error_1 = require("../calses/error");
+const simbolos_1 = require("../../Enviroment/simbolos");
+const Grammar_1 = require("../../controllers/Grammar");
+const error_1 = require("../error");
 class Declaracion {
     constructor(tipo, fila, columna, tipoDato, valor, entorno, identificador, contenidoExpresion) {
         this.tipo = tipo;
