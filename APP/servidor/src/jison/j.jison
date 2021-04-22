@@ -85,7 +85,8 @@ var ambAux = controllador.Grammar.ambienteGlobal
 
 <<EOF>>     return 'EOF';
 
-.       {let err = new Err.Error("Error Lexico","No se esperaba "+ yytext,yylloc.first_line,yylloc.first_column); controllador.Grammar.listaErrores.push(err);}
+.       {let err = new Err.Error("Error Lexico","No se esperaba "+ yytext,yylloc.first_line,yylloc.first_column); controllador.Grammar.listaErrores.push(err); 
+controllador.Grammar.consola +="->Error Lexico No se esperaba "+ yytext+" en linea "+yylloc.first_line+" columna "+yylloc.first_column+"\n"; }
 
 /lex 
 /* precedencia*/
@@ -104,30 +105,33 @@ var ambAux = controllador.Grammar.ambienteGlobal
 
 %start INICIAL
 %%
-/*
-inicial : FUNC_EXEC EOF {const gramatica = require("./controllers/Grammar")
-            gramatica.Grammar.consola += "Gerardo Hueco"}; */
+
 INICIAL: INSTRUCCIONES EOF
             |EOF {controllador.Grammar.consola +="Editor de texto vacio\n"};
 INSTRUCCIONES: INSTRUCCIONES INSTRUCCION {}
             | INSTRUCCION {};
 
 BLOQUE_SENTENCIAS: llave_abre INSTRUCCIONES llave_cierra { }
-                        | llave_abre llave_cierra{};
+                        | llave_abre llave_cierra{}
+                        |error llave_cierra{ err = new Err.Error("Error Sintactico","Se esperaba un } para cerrar el bloque cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);
+                        controllador.Grammar.consola+="->Error Sintactico Se esperaba un } para cerrar el bloque cerca de:"+ yytext+" linea "+this._$.first_line+" columna "+this._$.last_column+"\n";};
 
 INSTRUCCION: ASIGNACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstruccion($1);}
             |DECLARACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstruccion($1);}
             |MODIFICADOR{ambAux.agregarInstruccion($1);}
             |LLAMADA_FUNCION
             |SENTENCIA_CONTROL {ambAux.agregarInstruccion($1);}
-            |ASIGNACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);}
-            |DECLARACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);}
-            | error punto_coma { err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);};
+            |ASIGNACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err); 
+            controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";}
+            |DECLARACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);
+            controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";}
+            | error punto_coma { err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);
+            controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";};
 
 DECLARACION: TIPO_DATO identificador { simAux = new S.simbolo($1.getTipoDato(),$1.getValor()); 
 $$ = new Dec.Declaracion(E.tipoExpresion.identificador,@2.first_line,@2.first_column,simAux.tipo,null,ambAux,$2,null)};
 
-ASIGNACION: identificador op_igual EXPRESION {$$=new Asig.Asignacion(@1.first_line,@1.first_column,$3,String($1))}
+ASIGNACION: identificador op_igual EXPRESION {$$=new Asig.Asignacion(@1.first_line,@1.first_column,$3,String($1));}
         |TIPO_DATO identificador op_igual EXPRESION {
         $$ = new Dec.Declaracion(E.tipoExpresion.identificador,@2.first_line,@2.first_column,$1.tipo,$4.simbol.getValor(),ambAux,$2,$4);};
 
@@ -176,7 +180,8 @@ $$ = new E.expresion(null,$1,E.tipoExpresion.incremento,@1.first_line,@2.first_c
 $$ = new E.expresion(null,$1,E.tipoExpresion.decremento,@2.first_line,@2.first_column,null,null,null,null,ambAux); };
 
 SENTENCIA_CONTROL: IF BLOQUE_SENTENCIAS {$$=$1;ambAux=ambAux.getPadre()} 
+                |IF BLOQUE_SENTENCIAS ELSE BLOQUE_SENTENCIAS {$$=$1;$$.agregarElse($3) ;ambAux=ambAux.getPadre()}
                 |CONTROL_SWITCH ;
 
 IF: if par_abre EXPRESION par_cierra{ambAux = new Amb.Ambiente(ambAux,"Sentencia IF"); $$ =new If.IfSentence(@1.first_line,@1.first_column,$3,ambAux); } ;
-//ELSE: IF else BLOQUE_SENTENCIAS ;
+ELSE: else{ambAux = new Amb.Ambiente(ambAux.getPadre(),"Sentencia ELSE"); $$ =new If.SentenciaElse(@1.first_line,@1.first_column,ambAux);} ;

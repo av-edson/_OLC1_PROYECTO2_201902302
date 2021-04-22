@@ -6,7 +6,7 @@ class Asignacion {
         this.noLinea = linea;
         this.noColumna = columna;
         this.expre = expre;
-        this.ideVariable = identificador;
+        this.ideVariable = identificador.toLocaleLowerCase();
     }
     ejecutar() {
         this.expre.ejecutar();

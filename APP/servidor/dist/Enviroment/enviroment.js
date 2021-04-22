@@ -100,9 +100,7 @@ class Ambiente {
     }
     ejecutarAmbiente() {
         this.listaInstrucciones.forEach(element => {
-            if (!(element instanceof Ambiente)) {
-                element.ejecutar(null);
-            }
+            element.ejecutar(null);
         });
     }
 }

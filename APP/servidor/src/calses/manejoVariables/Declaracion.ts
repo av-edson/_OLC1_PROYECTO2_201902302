@@ -4,7 +4,7 @@ import { simbolo,tipoDatos } from "../../Enviroment/simbolos";
 import{tipoExpresion,expresion} from "../expresiones/expresion"
 import {Grammar} from "../../controllers/Grammar"
 import {Error}  from "../error"
-
+ 
 export class Declaracion implements instruccion{
     tipo:tipoExpresion;
     fila:number;
@@ -21,7 +21,7 @@ export class Declaracion implements instruccion{
         this.entorno=entorno;
         this.valor=valor;
         this.expresionDef = contenidoExpresion
-        this.identificador=identificador;
+        this.identificador=identificador.toLocaleLowerCase();
         this.tipoDato = tipoDato
     }
     ejecutar(){
@@ -51,6 +51,4 @@ export class Declaracion implements instruccion{
     getColumn(){
         return Number(this.columna)
     }
-
-
 }

@@ -10,20 +10,16 @@ export class IfSentence implements instruccion{
     private noLinea:number
     private noColumna:number
     private condicional:expresion
-    private listaInstrucciones:instruccion[]
     public ambiente:Ambiente
+    private elseSentencia:SentenciaElse|null;
     constructor(linea:number,columna:number,condicional:expresion,enviromento:Ambiente) {
         this.noLinea = linea
         this.noColumna = columna
         this.condicional=condicional
-        this.listaInstrucciones=[]
         this.ambiente = enviromento
+        this.elseSentencia = null
     }
 
-    public agregarInstruccion(instruccion:instruccion){
-        this.listaInstrucciones.push(instruccion)
-    }
-    public getInstruccion(){ return this.listaInstrucciones}
 
     ejecutar(){
         //ejecutar la condicional
@@ -32,6 +28,9 @@ export class IfSentence implements instruccion{
             if (this.condicional.simbol.getValor()=="true") {
                 this.ambiente.ejecutarAmbiente()
             }else{
+                if (this.elseSentencia!=null) {
+                    this.elseSentencia.ejecutar()
+                }
                 return
             }
         }else if (this.condicional.tipo == tipoExpresion.identificador || this.condicional.tipo == tipoExpresion.funcion) {
@@ -39,6 +38,9 @@ export class IfSentence implements instruccion{
             if (variable.valor == "true") {
                 this.ambiente.ejecutarAmbiente()
             }else{
+                if (this.elseSentencia!=null) {
+                    this.elseSentencia.ejecutar()
+                }
                 return
             }
         }
@@ -47,9 +49,15 @@ export class IfSentence implements instruccion{
             Grammar.consola+= "->Error semantico,la condicion agregada al IF no es de tipo booleano en liena "+this.noLinea+" columna "+this.noColumna+"\n";
         }
     }
+
+    public agregarElse(sentenciaE:SentenciaElse){
+        this.elseSentencia = sentenciaE
+    }
+
     getColumn(){
         return this.noColumna
     }
+
     getLine(){
         return this.noLinea
     }
@@ -58,17 +66,11 @@ export class IfSentence implements instruccion{
 export class SentenciaElse implements instruccion{
     private noLinea:number
     private noColumna:number
-    private listaInstrucciones:instruccion[]
     public ambiente:Ambiente
     constructor(linea:number,columna:number,enviromento:Ambiente) {
         this.noLinea = linea
         this.noColumna = columna
-        this.listaInstrucciones=[]
         this.ambiente = enviromento
-    }
-
-    public agregarInstruccion(instruccion:instruccion){
-        this.listaInstrucciones.push(instruccion)
     }
 
     ejecutar(){

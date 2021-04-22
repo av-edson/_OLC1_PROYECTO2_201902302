@@ -11,7 +11,7 @@ export class Asignacion implements instruccion {
         this.noLinea = linea
         this.noColumna = columna
         this.expre=expre
-        this.ideVariable = identificador
+        this.ideVariable = identificador.toLocaleLowerCase()
     } 
     ejecutar(){
         this.expre.ejecutar()

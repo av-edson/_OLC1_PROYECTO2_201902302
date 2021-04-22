@@ -5,11 +5,10 @@ import { Grammar } from "../controllers/Grammar";
 import { simbolo, tipoDatos } from "./simbolos";
 import {tablaSimbolosModel} from "../models/tabla-simbolos"
 import { instruccion } from "./instruccion";
-import { IfSentence } from "../calses/sentenciasControl/sentenciaIF";
 export class Ambiente {
-    public tablaSimbolos:Nodo[];
+    public tablaSimbolos:Array<Nodo>;
     private ambientePadre:Ambiente|null;
-    private listaInstrucciones:Array<Ambiente|instruccion>;
+    private listaInstrucciones:Array<instruccion>;
     private nombreAmbiente:string;
     constructor(padre:Ambiente|null, nombre:string) {
         this.tablaSimbolos=[];
@@ -17,7 +16,7 @@ export class Ambiente {
         this.nombreAmbiente=nombre;
         this.listaInstrucciones = []
     }
-
+ 
     public limpiarListas(){
         this.tablaSimbolos = []
         this.listaInstrucciones = []
@@ -113,9 +112,7 @@ export class Ambiente {
 
     public ejecutarAmbiente(){
         this.listaInstrucciones.forEach(element => {
-           if (!(element instanceof Ambiente)) {
-                element.ejecutar(null)
-           }
+            element.ejecutar(null)
         });
     }
 }

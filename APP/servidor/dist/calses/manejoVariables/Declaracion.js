@@ -12,7 +12,7 @@ class Declaracion {
         this.entorno = entorno;
         this.valor = valor;
         this.expresionDef = contenidoExpresion;
-        this.identificador = identificador;
+        this.identificador = identificador.toLocaleLowerCase();
         this.tipoDato = tipoDato;
     }
     ejecutar() {

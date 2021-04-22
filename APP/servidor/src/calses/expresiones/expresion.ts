@@ -178,13 +178,13 @@ export class expresion implements instruccion{
                 break;
         }
 
-        if (simboloDerecho !=null && simboloDerecho.tipo == tipoExpresion.identificador) {
-            if (this.tipo == tipoExpresion.incremento) {
+        if (this.derecho !=null && this.derecho.tipo == tipoExpresion.identificador) {
+            if (this.tipo == tipoExpresion.incremento || this.tipo == tipoExpresion.decremento) {
                 this.ambiente.editarSimbolo(der,this.noFila,this.noColumna,this)
             }
         }
         if (this.izquierdo !=null && this.izquierdo.tipo == tipoExpresion.identificador) {
-            if (this.tipo == tipoExpresion.incremento) {
+            if (this.tipo == tipoExpresion.incremento|| this.tipo == tipoExpresion.decremento) {
                 this.ambiente.editarSimbolo(izq,this.noFila,this.noColumna,this)
             }
         }
@@ -203,9 +203,6 @@ export class expresion implements instruccion{
 
     private operacionAritmetica(derecho:expresion|null,izquierdo:expresion|null,tipoOp:number){
         var resultado:number=0;
-        console.log(izquierdo   )
-        console.log("---------------")
-        console.log(derecho) 
         if (derecho != null && izquierdo != null) {
             try {
                 switch (tipoOp) {

@@ -171,13 +171,13 @@ class expresion {
             case tipoExpresion.nulo:
                 break;
         }
-        if (simboloDerecho != null && simboloDerecho.tipo == tipoExpresion.identificador) {
-            if (this.tipo == tipoExpresion.incremento) {
+        if (this.derecho != null && this.derecho.tipo == tipoExpresion.identificador) {
+            if (this.tipo == tipoExpresion.incremento || this.tipo == tipoExpresion.decremento) {
                 this.ambiente.editarSimbolo(der, this.noFila, this.noColumna, this);
             }
         }
         if (this.izquierdo != null && this.izquierdo.tipo == tipoExpresion.identificador) {
-            if (this.tipo == tipoExpresion.incremento) {
+            if (this.tipo == tipoExpresion.incremento || this.tipo == tipoExpresion.decremento) {
                 this.ambiente.editarSimbolo(izq, this.noFila, this.noColumna, this);
             }
         }
@@ -195,9 +195,6 @@ class expresion {
     }
     operacionAritmetica(derecho, izquierdo, tipoOp) {
         var resultado = 0;
-        console.log(izquierdo);
-        console.log("---------------");
-        console.log(derecho);
         if (derecho != null && izquierdo != null) {
             try {
                 switch (tipoOp) {

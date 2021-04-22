@@ -10,13 +10,9 @@ class IfSentence {
         this.noLinea = linea;
         this.noColumna = columna;
         this.condicional = condicional;
-        this.listaInstrucciones = [];
         this.ambiente = enviromento;
+        this.elseSentencia = null;
     }
-    agregarInstruccion(instruccion) {
-        this.listaInstrucciones.push(instruccion);
-    }
-    getInstruccion() { return this.listaInstrucciones; }
     ejecutar() {
         //ejecutar la condicional
         this.condicional.ejecutar();
@@ -25,6 +21,9 @@ class IfSentence {
                 this.ambiente.ejecutarAmbiente();
             }
             else {
+                if (this.elseSentencia != null) {
+                    this.elseSentencia.ejecutar();
+                }
                 return;
             }
         }
@@ -34,6 +33,9 @@ class IfSentence {
                 this.ambiente.ejecutarAmbiente();
             }
             else {
+                if (this.elseSentencia != null) {
+                    this.elseSentencia.ejecutar();
+                }
                 return;
             }
         }
@@ -41,6 +43,9 @@ class IfSentence {
             Grammar_1.Grammar.listaErrores.push(new error_1.Error("Error semantico", "La condicion agregada al IF no es de tipo booleano", this.noLinea, this.noColumna));
             Grammar_1.Grammar.consola += "->Error semantico,la condicion agregada al IF no es de tipo booleano en liena " + this.noLinea + " columna " + this.noColumna + "\n";
         }
+    }
+    agregarElse(sentenciaE) {
+        this.elseSentencia = sentenciaE;
     }
     getColumn() {
         return this.noColumna;
@@ -54,11 +59,7 @@ class SentenciaElse {
     constructor(linea, columna, enviromento) {
         this.noLinea = linea;
         this.noColumna = columna;
-        this.listaInstrucciones = [];
         this.ambiente = enviromento;
-    }
-    agregarInstruccion(instruccion) {
-        this.listaInstrucciones.push(instruccion);
     }
     ejecutar() {
         this.ambiente.ejecutarAmbiente();
