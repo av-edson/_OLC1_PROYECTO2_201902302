@@ -20,7 +20,7 @@ export class IfSentence implements instruccion{
         this.ambiente = enviromento
     }
 
-    public agregarInstruccion(instruccion:Declaracion){
+    public agregarInstruccion(instruccion:instruccion){
         this.listaInstrucciones.push(instruccion)
     }
     public getInstruccion(){ return this.listaInstrucciones}
@@ -32,17 +32,14 @@ export class IfSentence implements instruccion{
             if (this.condicional.simbol.getValor()=="true") {
                 this.ambiente.ejecutarAmbiente()
             }else{
-                console.log("neeel 1")
                 return
             }
         }else if (this.condicional.tipo == tipoExpresion.identificador || this.condicional.tipo == tipoExpresion.funcion) {
             let variable:Nodo = this.ambiente.buscarEnTabla(this.condicional.simbol.getValor(),this.noColumna,this.noColumna)
             if (variable.valor == "true") {
-                console.log('aca')
                 this.ambiente.ejecutarAmbiente()
             }else{
-                console.log("neeel 2")
-
+                return
             }
         }
         else{
@@ -50,6 +47,35 @@ export class IfSentence implements instruccion{
             Grammar.consola+= "->Error semantico,la condicion agregada al IF no es de tipo booleano en liena "+this.noLinea+" columna "+this.noColumna+"\n";
         }
     }
+    getColumn(){
+        return this.noColumna
+    }
+    getLine(){
+        return this.noLinea
+    }
+}
+
+export class SentenciaElse implements instruccion{
+    private noLinea:number
+    private noColumna:number
+    private listaInstrucciones:instruccion[]
+    public ambiente:Ambiente
+    constructor(linea:number,columna:number,enviromento:Ambiente) {
+        this.noLinea = linea
+        this.noColumna = columna
+        this.listaInstrucciones=[]
+        this.ambiente = enviromento
+    }
+
+    public agregarInstruccion(instruccion:instruccion){
+        this.listaInstrucciones.push(instruccion)
+    }
+
+    ejecutar(){
+        this.ambiente.ejecutarAmbiente()
+    }
+
+
     getColumn(){
         return this.noColumna
     }

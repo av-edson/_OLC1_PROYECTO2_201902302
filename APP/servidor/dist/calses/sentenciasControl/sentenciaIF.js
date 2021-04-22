@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tipoControl = exports.IfSentence = void 0;
+exports.tipoControl = exports.SentenciaElse = exports.IfSentence = void 0;
 const simbolos_1 = require("../../Enviroment/simbolos");
 const expresion_1 = require("./../expresiones/expresion");
 const Grammar_1 = require("../../controllers/Grammar");
@@ -25,18 +25,16 @@ class IfSentence {
                 this.ambiente.ejecutarAmbiente();
             }
             else {
-                console.log("neeel 1");
                 return;
             }
         }
         else if (this.condicional.tipo == expresion_1.tipoExpresion.identificador || this.condicional.tipo == expresion_1.tipoExpresion.funcion) {
             let variable = this.ambiente.buscarEnTabla(this.condicional.simbol.getValor(), this.noColumna, this.noColumna);
             if (variable.valor == "true") {
-                console.log('aca');
                 this.ambiente.ejecutarAmbiente();
             }
             else {
-                console.log("neeel 2");
+                return;
             }
         }
         else {
@@ -52,6 +50,27 @@ class IfSentence {
     }
 }
 exports.IfSentence = IfSentence;
+class SentenciaElse {
+    constructor(linea, columna, enviromento) {
+        this.noLinea = linea;
+        this.noColumna = columna;
+        this.listaInstrucciones = [];
+        this.ambiente = enviromento;
+    }
+    agregarInstruccion(instruccion) {
+        this.listaInstrucciones.push(instruccion);
+    }
+    ejecutar() {
+        this.ambiente.ejecutarAmbiente();
+    }
+    getColumn() {
+        return this.noColumna;
+    }
+    getLine() {
+        return this.noLinea;
+    }
+}
+exports.SentenciaElse = SentenciaElse;
 var tipoControl;
 (function (tipoControl) {
     tipoControl[tipoControl["if"] = 0] = "if";
