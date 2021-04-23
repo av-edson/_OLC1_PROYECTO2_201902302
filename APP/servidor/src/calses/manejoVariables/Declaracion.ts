@@ -43,7 +43,7 @@ export class Declaracion implements instruccion{
             Grammar.listaErrores.push(new Error("Error semantico","Asignacion Incorrecta",this.fila,this.columna))
             Grammar.consola+= " ->Error semantico en asignacion linea: "+this.fila+" columna: "+this.columna+"\n";
         }
-    }
+    } 
 
     getLine(){
         return Number(this.fila)

@@ -61,6 +61,10 @@ export class IfSentence implements instruccion{
     getLine(){
         return this.noLinea
     }
+
+    public getExpresion(){
+        return this.condicional;
+    }
 }
 
 export class SentenciaElse implements instruccion{

@@ -6,14 +6,16 @@ import { instruccion } from "../Enviroment/instruccion";
 export const compilarEntrada = (req:Request, res:Response) => {
     try {
         const conteido = req.body.code;
-        Grammar.ambienteGlobal.limpiarListas()
         Grammar.consola = "";
         Grammar.listaErrores = [];
+        Grammar.ambienteGlobal.limpiarListas()
         
-        let parser = require('../j.js')
+        const parser = require('../j.js')
+        
         parser.parse(conteido)
-        
+        //console.log("---------------------")
         //console.log(Grammar.ambienteGlobal.getListaInstrucciones())
+        //console.log("---------------------")
         //console.log(Grammar.ambienteGlobal)
         Grammar.ambienteGlobal.ejecutarAmbiente()
         res.json({
@@ -22,8 +24,9 @@ export const compilarEntrada = (req:Request, res:Response) => {
             simbolos:Grammar.ambienteGlobal.getTablaSimbolos()
         })
     } catch (error) {
+        console.log(error)
         res.json({
-            mensaje: "Error fatal del Interprete",
+            mensaje: "Error fatal del Interprete\n"+error,
             errores: [],
             simbolos:[]
         })

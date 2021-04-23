@@ -12,9 +12,11 @@ const I = require("./Enviroment/instruccion")
 const Dec = require("./calses/manejoVariables/Declaracion")
 const Asig = require("./calses/manejoVariables/asignacion")
 const If = require("./calses/sentenciasControl/sentenciaIF")
+const elif = require("./calses/sentenciasControl/sentenciaElif")
 var err;
 var simAux;
-var ambAux = controllador.Grammar.ambienteGlobal
+var ambAux =controllador.Grammar.ambienteGlobal;
+var listIf = [];
 %}
 %lex 
 %options case-insensitive
@@ -73,6 +75,7 @@ var ambAux = controllador.Grammar.ambienteGlobal
 // palabras reservadas
 "if"            return 'if';
 "else"          return 'else';
+
 /* datos */
 [0-9]+("."[0-9]+)\b       return 'decimal';
 [0-9]+\b                    return 'entero';
@@ -179,9 +182,19 @@ $$ = new E.expresion(null,$1,E.tipoExpresion.incremento,@1.first_line,@2.first_c
         |identificador decremento punto_coma{$1=new E.expresion(null,null,E.tipoExpresion.identificador,@1.first_line,@1.first_column,null,String($1),null,null,ambAux);
 $$ = new E.expresion(null,$1,E.tipoExpresion.decremento,@2.first_line,@2.first_column,null,null,null,null,ambAux); };
 
-SENTENCIA_CONTROL: IF BLOQUE_SENTENCIAS {$$=$1;ambAux=ambAux.getPadre()} 
+SENTENCIA_CONTROL: IF BLOQUE_SENTENCIAS else IF BLOQUE_SENTENCIAS ELIF {let eli=new elif.Elif(@1.first_line,@1.first_column);
+                eli.agregarInicial($1); eli.agregarIf($4); eli.agregarSentencias(listIf); ambAux=ambAux.getPadre(); $$=eli; listIf=[]} 
+                |IF BLOQUE_SENTENCIAS {$$=$1;ambAux=ambAux.getPadre()} 
                 |IF BLOQUE_SENTENCIAS ELSE BLOQUE_SENTENCIAS {$$=$1;$$.agregarElse($3) ;ambAux=ambAux.getPadre()}
                 |CONTROL_SWITCH ;
 
-IF: if par_abre EXPRESION par_cierra{ambAux = new Amb.Ambiente(ambAux,"Sentencia IF"); $$ =new If.IfSentence(@1.first_line,@1.first_column,$3,ambAux); } ;
-ELSE: else{ambAux = new Amb.Ambiente(ambAux.getPadre(),"Sentencia ELSE"); $$ =new If.SentenciaElse(@1.first_line,@1.first_column,ambAux);} ;
+IF: if par_abre EXPRESION par_cierra{ambAux = new Amb.Ambiente(ambAux,"Sentencia IF"); $$ =new If.IfSentence(@1.first_line,@1.first_column,$3,ambAux);};
+
+ELSE: else{ambAux = new Amb.Ambiente(ambAux.getPadre(),"Sentencia ELSE"); $$ =new If.SentenciaElse(@1.first_line,@1.first_column,ambAux);};
+
+ELIF: else IF BLOQUE_SENTENCIAS ELIF{listIf.push($2);ambAux=ambAux.getPadre();}
+        |ELSE BLOQUE_SENTENCIAS {listIf.push($1);ambAux=ambAux.getPadre()};
+/*
+        |else IF BLOQUE_SENTENCIAS{listIf.push($2);ambAux=ambAux.getPadre();
+        controllador.Grammar.consola+="->Advertencia! falta una sentencia de cierre \"else\" en liena "+@1.first_line+" columna "+@1.first_column+"\n";}
+        */

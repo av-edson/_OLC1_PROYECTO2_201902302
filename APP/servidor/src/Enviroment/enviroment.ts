@@ -48,8 +48,7 @@ export class Ambiente {
             });
         }else{
             this.listaInstrucciones.push(agregado)
-        }
-        
+        }      
     }
     public agregarSimbolo(agregado:Declaracion){
         if (agregado instanceof Declaracion) {

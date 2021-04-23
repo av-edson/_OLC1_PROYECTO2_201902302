@@ -53,6 +53,9 @@ class IfSentence {
     getLine() {
         return this.noLinea;
     }
+    getExpresion() {
+        return this.condicional;
+    }
 }
 exports.IfSentence = IfSentence;
 class SentenciaElse {
