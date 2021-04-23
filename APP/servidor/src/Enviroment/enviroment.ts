@@ -10,11 +10,13 @@ export class Ambiente {
     private ambientePadre:Ambiente|null;
     private listaInstrucciones:Array<instruccion>;
     private nombreAmbiente:string;
+    public estaEnCiclo:boolean;
     constructor(padre:Ambiente|null, nombre:string) {
         this.tablaSimbolos=[];
         this.ambientePadre = padre;
         this.nombreAmbiente=nombre;
-        this.listaInstrucciones = []
+        this.listaInstrucciones = [];
+        this.estaEnCiclo = false
     }
  
     public limpiarListas(){
@@ -41,6 +43,9 @@ export class Ambiente {
         return this.nombreAmbiente
     }
 
+    public enciclado(){
+        return this.estaEnCiclo;
+    }
     public agregarInstruccion(agregado:Ambiente|instruccion){
         if (agregado instanceof Ambiente) {
             agregado.listaInstrucciones.forEach(element => {

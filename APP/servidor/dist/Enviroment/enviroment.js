@@ -12,6 +12,7 @@ class Ambiente {
         this.ambientePadre = padre;
         this.nombreAmbiente = nombre;
         this.listaInstrucciones = [];
+        this.estaEnCiclo = false;
     }
     limpiarListas() {
         this.tablaSimbolos = [];
@@ -32,6 +33,9 @@ class Ambiente {
     }
     getNombreAmbiente() {
         return this.nombreAmbiente;
+    }
+    enciclado() {
+        return this.estaEnCiclo;
     }
     agregarInstruccion(agregado) {
         if (agregado instanceof Ambiente) {

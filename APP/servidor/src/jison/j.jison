@@ -1,18 +1,15 @@
 %{
 const controllador = require("./controllers/Grammar")
-//import { Ambiente } from "../Enviroment/enviroment";
-//import { instruccion } from "../Enviroment/instruccion";
-//import { simbolo } from "../Enviroment/simbolos";
-//import {expresion} from "../calses/expresion"
-const E = require("./calses/expresiones/expresion")
-const Err = require("./calses/error")
-const Amb = require("./Enviroment/enviroment")
-const S = require("./Enviroment/simbolos")
-const I = require("./Enviroment/instruccion")
-const Dec = require("./calses/manejoVariables/Declaracion")
-const Asig = require("./calses/manejoVariables/asignacion")
-const If = require("./calses/sentenciasControl/sentenciaIF")
-const elif = require("./calses/sentenciasControl/sentenciaElif")
+const E = require("./calses/expresiones/expresion") // clase expresion
+const Err = require("./calses/error") // clase error
+const Amb = require("./Enviroment/enviroment") //clase ambiente
+const S = require("./Enviroment/simbolos") // clase simbolo
+const I = require("./Enviroment/instruccion")//clase instruccion
+const Dec = require("./calses/manejoVariables/Declaracion") // clase declaracion
+const Asig = require("./calses/manejoVariables/asignacion") // clase asignacion 
+const If = require("./calses/sentenciasControl/sentenciaIF") // clase IF
+const elif = require("./calses/sentenciasControl/sentenciaElif") // clase ELIF
+const Switch = require("./calses/sentenciasControl/SwitchSentencia") //clase SWITCH
 var err;
 var simAux;
 var ambAux =controllador.Grammar.ambienteGlobal;
@@ -23,7 +20,7 @@ var listIf = [];
 
 %%
 /*comentarios*/
-("/"{2,})([^\n])*\n\b {}
+("/"{2,})([^\n])*\n {console.log(yytext);}
 //("/""*")([^\n\r]|\n)*("*/") {console.log(yytext);}
 "/""*"(([^\n\r]|\n)*)("*""/") {}
 /* tipos de datos */
@@ -75,7 +72,10 @@ var listIf = [];
 // palabras reservadas
 "if"            return 'if';
 "else"          return 'else';
-
+"switch"        return 'switch';
+"case"          return 'case';
+"break"         return 'break';
+"default"       return 'default';       
 /* datos */
 [0-9]+("."[0-9]+)\b       return 'decimal';
 [0-9]+\b                    return 'entero';
@@ -124,12 +124,13 @@ INSTRUCCION: ASIGNACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstr
             |MODIFICADOR{ambAux.agregarInstruccion($1);}
             |LLAMADA_FUNCION
             |SENTENCIA_CONTROL {ambAux.agregarInstruccion($1);}
+            |break punto_coma{ambAux.agregarInstruccion(new Switch.SentenciaBreack(@1.first_line,@1.first_column,ambAux));}
             |ASIGNACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err); 
             controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";}
             |DECLARACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);
-            controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";}
-            | error punto_coma { err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);
             controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";};
+            //| error punto_coma { err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);
+            //controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";};
 
 DECLARACION: TIPO_DATO identificador { simAux = new S.simbolo($1.getTipoDato(),$1.getValor()); 
 $$ = new Dec.Declaracion(E.tipoExpresion.identificador,@2.first_line,@2.first_column,simAux.tipo,null,ambAux,$2,null)};
@@ -186,7 +187,7 @@ SENTENCIA_CONTROL: IF BLOQUE_SENTENCIAS else IF BLOQUE_SENTENCIAS ELIF {let eli=
                 eli.agregarInicial($1); eli.agregarIf($4); eli.agregarSentencias(listIf); ambAux=ambAux.getPadre(); $$=eli; listIf=[]} 
                 |IF BLOQUE_SENTENCIAS {$$=$1;ambAux=ambAux.getPadre()} 
                 |IF BLOQUE_SENTENCIAS ELSE BLOQUE_SENTENCIAS {$$=$1;$$.agregarElse($3) ;ambAux=ambAux.getPadre()}
-                |CONTROL_SWITCH ;
+                |CONTROL_SWITCH {listIf=[]};
 
 IF: if par_abre EXPRESION par_cierra{ambAux = new Amb.Ambiente(ambAux,"Sentencia IF"); $$ =new If.IfSentence(@1.first_line,@1.first_column,$3,ambAux);};
 
@@ -194,7 +195,20 @@ ELSE: else{ambAux = new Amb.Ambiente(ambAux.getPadre(),"Sentencia ELSE"); $$ =ne
 
 ELIF: else IF BLOQUE_SENTENCIAS ELIF{listIf.push($2);ambAux=ambAux.getPadre();}
         |ELSE BLOQUE_SENTENCIAS {listIf.push($1);ambAux=ambAux.getPadre()};
-/*
-        |else IF BLOQUE_SENTENCIAS{listIf.push($2);ambAux=ambAux.getPadre();
-        controllador.Grammar.consola+="->Advertencia! falta una sentencia de cierre \"else\" en liena "+@1.first_line+" columna "+@1.first_column+"\n";}
-        */
+
+CONTROL_SWITCH: switch SWITCH llave_abre CASELIST llave_cierra {$$=$2;$$.ingresarCases(listIf)}
+        |switch SWITCH llave_abre DEFAULT llave_cierra
+        |switch SWITCH llave_abre CASELIST DEFAULT llave_cierra;
+
+SWITCH: par_abre EXPRESION par_cierra{$$=new Switch.SentenciaSwitch(@1.first_line,@1.first_column,$2,ambAux);};
+
+CASELIST: CASES CASELIST{listIf.push($1);}
+        |CASES {listIf.push($1); };
+
+CASES: CASE INSTRUCCIONES {$$=$1; ambAux = ambAux.getPadre(); }
+        |CASE{$$=$1; ambAux = ambAux.getPadre();};
+
+CASE: case EXPRESION dos_puntos {ambAux=new Amb.Ambiente(ambAux,"case "+listIf.length);
+        $$=new Switch.CaseSentencia(@1.first_line,@1.first_column,$2,ambAux);};
+
+DEFAULT: default dos_puntos INSTRUCCIONES {};

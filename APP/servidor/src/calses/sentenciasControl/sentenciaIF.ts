@@ -1,10 +1,9 @@
 import { Ambiente, Nodo } from "../../Enviroment/enviroment";
 import { instruccion } from "../../Enviroment/instruccion";
-import { simbolo,tipoDatos } from "../../Enviroment/simbolos";
+import {tipoDatos } from "../../Enviroment/simbolos";
 import{tipoExpresion,expresion} from "./../expresiones/expresion"
 import {Grammar} from "../../controllers/Grammar"
 import {Error}  from "../../calses/error"
-import { Declaracion } from "../manejoVariables/Declaracion";
 
 export class IfSentence implements instruccion{
     private noLinea:number

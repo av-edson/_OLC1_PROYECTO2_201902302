@@ -28,19 +28,19 @@ class Elif {
             return;
         }
         else {
-            this.listaIfs.forEach(element => {
-                console.log(element);
+            let encontrado = false;
+            for (let i = 0; i < this.listaIfs.length; i++) {
+                const element = this.listaIfs[i];
                 if (element instanceof sentenciaIF_1.IfSentence) {
                     element.ejecutar();
                     if (element.getExpresion().simbol.getValor() == "true") {
-                        return;
+                        break;
                     }
                 }
                 else {
-                    console.log('-------ACA------');
                     element.ejecutar();
                 }
-            });
+            }
         }
     }
     getColumn() {

@@ -1,10 +1,4 @@
-import { Ambiente, Nodo } from "../../Enviroment/enviroment";
 import { instruccion } from "../../Enviroment/instruccion";
-import { simbolo,tipoDatos } from "../../Enviroment/simbolos";
-import{tipoExpresion,expresion} from "./../expresiones/expresion"
-import {Grammar} from "../../controllers/Grammar"
-import {Error}  from "../../calses/error"
-import { Declaracion } from "../manejoVariables/Declaracion";
 import { IfSentence, SentenciaElse } from "./sentenciaIF";
 
 export class Elif  implements instruccion{
@@ -38,18 +32,18 @@ export class Elif  implements instruccion{
         if (this.ifInicial?.getExpresion().simbol.getValor()=="true") {
             return
         }else{ 
-            this.listaIfs.forEach(element => {
-                console.log(element)
+            let encontrado = false;
+            for (let i = 0; i < this.listaIfs.length; i++) {
+                const element = this.listaIfs[i];
                 if (element instanceof IfSentence) {
                     element.ejecutar()
                     if (element.getExpresion().simbol.getValor()=="true") {
-                        return
-                    } 
+                        break;
+                    }
                 }else{ 
-                    console.log('-------ACA------')
                     element.ejecutar()
                 }
-            });
+            }
         }
     }
 
