@@ -6,6 +6,7 @@ const error_1 = require("../calses/error");
 const expresion_1 = require("../calses/expresiones/expresion");
 const Grammar_1 = require("../controllers/Grammar");
 const simbolos_1 = require("./simbolos");
+const SwitchSentencia_1 = require("../calses/sentenciasControl/SwitchSentencia");
 class Ambiente {
     constructor(padre, nombre) {
         this.tablaSimbolos = [];
@@ -13,6 +14,7 @@ class Ambiente {
         this.nombreAmbiente = nombre;
         this.listaInstrucciones = [];
         this.estaEnCiclo = false;
+        this.encicloBreak = false;
     }
     limpiarListas() {
         this.tablaSimbolos = [];
@@ -103,9 +105,15 @@ class Ambiente {
         return salida;
     }
     ejecutarAmbiente() {
-        this.listaInstrucciones.forEach(element => {
+        for (let i = 0; i < this.listaInstrucciones.length; i++) {
+            const element = this.listaInstrucciones[i];
+            if (this.estaEnCiclo == true && element instanceof SwitchSentencia_1.SentenciaBreack) {
+                element.ejecutar();
+                this.encicloBreak = true;
+                break;
+            }
             element.ejecutar(null);
-        });
+        }
     }
 }
 exports.Ambiente = Ambiente;

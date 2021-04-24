@@ -20,7 +20,7 @@ var listIf = [];
 
 %%
 /*comentarios*/
-("/"{2,})([^\n])*\n {console.log(yytext);}
+("/"{2,})([^\n])*\n {}
 //("/""*")([^\n\r]|\n)*("*/") {console.log(yytext);}
 "/""*"(([^\n\r]|\n)*)("*""/") {}
 /* tipos de datos */
@@ -128,9 +128,9 @@ INSTRUCCION: ASIGNACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstr
             |ASIGNACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err); 
             controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";}
             |DECLARACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err);
+            controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";}
+            | error punto_coma { err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);
             controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";};
-            //| error punto_coma { err = new Err.Error("Error Sintactico","No se esperaba "+ yytext,this._$.first_line,this._$.first_column); controllador.Grammar.listaErrores.push(err);
-            //controllador.Grammar.consola+="->Error Sintactico Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext+" en linea "+this._$.first_line+" columna "+this._$.last_column+"\n";};
 
 DECLARACION: TIPO_DATO identificador { simAux = new S.simbolo($1.getTipoDato(),$1.getValor()); 
 $$ = new Dec.Declaracion(E.tipoExpresion.identificador,@2.first_line,@2.first_column,simAux.tipo,null,ambAux,$2,null)};
@@ -196,19 +196,22 @@ ELSE: else{ambAux = new Amb.Ambiente(ambAux.getPadre(),"Sentencia ELSE"); $$ =ne
 ELIF: else IF BLOQUE_SENTENCIAS ELIF{listIf.push($2);ambAux=ambAux.getPadre();}
         |ELSE BLOQUE_SENTENCIAS {listIf.push($1);ambAux=ambAux.getPadre()};
 
-CONTROL_SWITCH: switch SWITCH llave_abre CASELIST llave_cierra {$$=$2;$$.ingresarCases(listIf)}
-        |switch SWITCH llave_abre DEFAULT llave_cierra
-        |switch SWITCH llave_abre CASELIST DEFAULT llave_cierra;
+CONTROL_SWITCH: switch SWITCH llave_abre CASELIST llave_cierra {$$=$2;$$.ingresarCases(listIf)};
 
 SWITCH: par_abre EXPRESION par_cierra{$$=new Switch.SentenciaSwitch(@1.first_line,@1.first_column,$2,ambAux);};
 
 CASELIST: CASES CASELIST{listIf.push($1);}
         |CASES {listIf.push($1); };
-
+ 
 CASES: CASE INSTRUCCIONES {$$=$1; ambAux = ambAux.getPadre(); }
-        |CASE{$$=$1; ambAux = ambAux.getPadre();};
+        |CASE{$$=$1; ambAux = ambAux.getPadre();}
+        |DEFAULTS;
 
 CASE: case EXPRESION dos_puntos {ambAux=new Amb.Ambiente(ambAux,"case "+listIf.length);
         $$=new Switch.CaseSentencia(@1.first_line,@1.first_column,$2,ambAux);};
 
-DEFAULT: default dos_puntos INSTRUCCIONES {};
+DEFAULTS: DEFAULT INSTRUCCIONES {$$=$1; ambAux = ambAux.getPadre();listIf.push($1);};
+
+DEFAULT: default dos_puntos {ambAux=new Amb.Ambiente(ambAux,"case "+listIf.length);
+        $$=new Switch.CaseSentencia(@1.first_line,@1.first_column,null,ambAux);
+        $$.siDefault()};

@@ -5,18 +5,21 @@ import { Grammar } from "../controllers/Grammar";
 import { simbolo, tipoDatos } from "./simbolos";
 import {tablaSimbolosModel} from "../models/tabla-simbolos"
 import { instruccion } from "./instruccion";
+import { SentenciaBreack } from "../calses/sentenciasControl/SwitchSentencia";
 export class Ambiente {
     public tablaSimbolos:Array<Nodo>;
     private ambientePadre:Ambiente|null;
     private listaInstrucciones:Array<instruccion>;
     private nombreAmbiente:string;
     public estaEnCiclo:boolean;
+    public encicloBreak:boolean;
     constructor(padre:Ambiente|null, nombre:string) {
         this.tablaSimbolos=[];
         this.ambientePadre = padre;
         this.nombreAmbiente=nombre;
         this.listaInstrucciones = [];
         this.estaEnCiclo = false
+        this.encicloBreak=false;
     }
  
     public limpiarListas(){
@@ -115,9 +118,15 @@ export class Ambiente {
     }
 
     public ejecutarAmbiente(){
-        this.listaInstrucciones.forEach(element => {
+        for (let i = 0; i < this.listaInstrucciones.length; i++) {
+            const element = this.listaInstrucciones[i];
+            if (this.estaEnCiclo==true && element instanceof SentenciaBreack) {
+                element.ejecutar()
+                this.encicloBreak=true
+                break;
+            }
             element.ejecutar(null)
-        });
+        }
     }
 }
 

@@ -16,20 +16,23 @@ class SentenciaSwitch {
     ejecutar() {
         this.listaCases.reverse();
         for (let i = 0; i < this.listaCases.length; i++) {
-            let derecho = new expresion_1.expresion(this.condicional.derecho, this.condicional.izquierdo, this.condicional.tipo, this.condicional.noFila, this.condicional.noColumna, this.condicional.simbol.tipo, this.condicional.simbol.valor, null, null, this.condicional.ambiente);
             const sentCase = this.listaCases[i];
-            let aux = new expresion_1.expresion(derecho, sentCase.getExpresion(), expresion_1.tipoExpresion.igualdad, this.noLinea, this.noColumna, simbolos_1.tipoDatos.booleano, null, null, null, this.ambiente);
-            aux.ejecutar();
-            // ver si la expresion del case cumple con la del switch
-            if (aux.simbol.getValor() == "true") {
+            if (sentCase.esDefault) {
                 sentCase.ejecutar();
-                if (sentCase.getBrack()) {
-                    break;
+                break;
+            }
+            else {
+                let derecho = new expresion_1.expresion(this.condicional.derecho, this.condicional.izquierdo, this.condicional.tipo, this.condicional.noFila, this.condicional.noColumna, this.condicional.simbol.tipo, this.condicional.simbol.valor, null, null, this.condicional.ambiente);
+                let aux = new expresion_1.expresion(derecho, sentCase.getExpresion(), expresion_1.tipoExpresion.igualdad, this.noLinea, this.noColumna, simbolos_1.tipoDatos.booleano, null, null, null, this.ambiente);
+                aux.ejecutar();
+                // ver si la expresion del case cumple con la del switch
+                if (aux.simbol.getValor() == "true") {
+                    sentCase.ejecutar();
+                    if (sentCase.getBrack()) {
+                        break;
+                    }
                 }
             }
-            //else{
-            //    console.log("no cumplió")
-            //}
         }
     }
     getColumn() {
@@ -54,19 +57,19 @@ class CaseSentencia {
         this.comparador = condicional;
         this.ambiente = enviromento;
         this.brackLeido = false;
+        this.esDefault = false;
     }
     getExpresion() {
         return this.comparador;
     }
+    siDefault() {
+        this.esDefault = true;
+    }
     ejecutar() {
         this.ambiente.estaEnCiclo = true;
-        for (let i = 0; i < this.ambiente.getListaInstrucciones().length; i++) {
-            const element = this.ambiente.getListaInstrucciones()[i];
-            if (element instanceof SentenciaBreack) {
-                this.brackLeido = true;
-                break;
-            }
-            element.ejecutar(null);
+        this.ambiente.ejecutarAmbiente();
+        if (this.ambiente.encicloBreak) {
+            this.brackLeido = true;
         }
     }
     getBrack() {

@@ -20,23 +20,25 @@ export class SentenciaSwitch implements instruccion {
         this.ambiente = enviromento
         this.listaCases = []
     }
-    ejecutar(){     
-        this.listaCases.reverse()
+    ejecutar(){  
+        this.listaCases.reverse()   
         for (let i = 0; i < this.listaCases.length; i++) {
-            let derecho = new expresion(this.condicional.derecho,this.condicional.izquierdo,this.condicional.tipo,this.condicional.noFila,this.condicional.noColumna,this.condicional.simbol.tipo,this.condicional.simbol.valor,null,null,this.condicional.ambiente)
             const sentCase = this.listaCases[i];
-            let aux = new expresion(derecho,sentCase.getExpresion(),tipoExpresion.igualdad,this.noLinea,this.noColumna,tipoDatos.booleano,null,null,null,this.ambiente)
-            aux.ejecutar()
-            // ver si la expresion del case cumple con la del switch
-            if (aux.simbol.getValor()=="true") {
-                sentCase.ejecutar()
-                if (sentCase.getBrack()) {
-                    break
+            if (sentCase.esDefault) {
+                sentCase.ejecutar() 
+                break  
+            }else{
+                let derecho = new expresion(this.condicional.derecho,this.condicional.izquierdo,this.condicional.tipo,this.condicional.noFila,this.condicional.noColumna,this.condicional.simbol.tipo,this.condicional.simbol.valor,null,null,this.condicional.ambiente)
+                let aux = new expresion(derecho,sentCase.getExpresion(),tipoExpresion.igualdad,this.noLinea,this.noColumna,tipoDatos.booleano,null,null,null,this.ambiente)
+                aux.ejecutar()
+                // ver si la expresion del case cumple con la del switch
+                if (aux.simbol.getValor()=="true") {
+                    sentCase.ejecutar()
+                    if (sentCase.getBrack()) {
+                        break
+                    }
                 }
             }
-            //else{
-            //    console.log("no cumplió")
-            //}
         }
     }
     getColumn(){
@@ -61,25 +63,26 @@ export class CaseSentencia implements instruccion {
     private comparador:expresion
     public ambiente:Ambiente
     private brackLeido:boolean;
+    public esDefault:boolean;
     constructor(linea:number,columna:number,condicional:expresion,enviromento:Ambiente) {
         this.noLinea = linea
         this.noColumna = columna
         this.comparador=condicional
         this.ambiente = enviromento
         this.brackLeido =false
+        this.esDefault= false;
     }
     public getExpresion(){
         return this.comparador
     }
+    public siDefault(){
+        this.esDefault = true
+    }
     ejecutar(){
         this.ambiente.estaEnCiclo=true
-        for (let i = 0; i < this.ambiente.getListaInstrucciones().length; i++) {
-            const element = this.ambiente.getListaInstrucciones()[i];
-            if (element instanceof SentenciaBreack) {
-                this.brackLeido = true
-                break;
-            }
-            element.ejecutar(null)
+        this.ambiente.ejecutarAmbiente()
+        if (this.ambiente.encicloBreak) {
+            this.brackLeido = true
         }
     }
     getBrack(){
