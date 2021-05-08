@@ -106,9 +106,6 @@ class expresion {
         }
         switch (this.tipo) {
             case tipoExpresion.suma:
-                console.log("entro expresion");
-                console.log(simboloIzquierdo);
-                console.log(simboloDerecho);
                 this.simbol = this.operacionAritmetica(simboloDerecho, simboloIzquierdo, 1);
                 break;
             case tipoExpresion.resta:

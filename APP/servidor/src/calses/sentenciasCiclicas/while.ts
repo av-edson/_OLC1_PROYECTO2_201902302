@@ -25,35 +25,31 @@ export class WhileSentencia implements instruccion {
     }
 
     ejecutar(){
-        //this.condicional.ejecutar()
-        //var izquierdo =new expresion(this.condicional.derecho,this.condicional.izquierdo,this.condicional.tipo,this.condicional.noFila,this.condicional.noColumna,this.condicional.simbol.tipo,this.condicional.simbol.valor,null,null,this.condicional.ambiente)
-        var expresionTempral = new expresion(this.condicional.derecho,this.condicional.izquierdo,this.condicional.tipo,this.condicional.noFila,this.condicional.noColumna,this.condicional.simbol.tipo,this.condicional.simbol.valor,null,null,this.condicional.ambiente)
-        var i:number =0;
-        var derecho:simbolo=new simbolo(null,"");
+        /*
+            var derecho:simbolo=new simbolo(null,"");
             var izquierdo  :simbolo=new simbolo(null,"");;
             if (this.condicional.izquierdo != null) {
                 izquierdo = new simbolo(this.condicional.izquierdo.simbol.tipo,this.condicional.izquierdo.simbol.valor);
             }if (this.condicional.derecho != null) {
                 derecho = new simbolo(this.condicional.derecho.simbol.tipo,this.condicional.derecho.simbol.valor);
             }
-        //console.log("--------------------------")
-        //console.log(expresionTempral)
-        //console.log("--------------------------")
-        //console.log(this.ambiente.getListaInstrucciones())
-        while(i<=1){  
-            this.ambiente.ejecutarAmbiente() 
+            //this.ambiente.ejecutarAmbiente() 
             //console.log(i)
-            expresionTempral.ejecutar()
+            //expresionTempral.ejecutar()
             // expresiones nuevas
-            expresionTempral = new expresion(expresionTempral.derecho,expresionTempral.izquierdo,expresionTempral.tipo,expresionTempral.noFila,expresionTempral.noColumna,expresionTempral.simbol.tipo,expresionTempral.simbol.valor,null,null,expresionTempral.ambiente)
+            //expresionTempral = new expresion(expresionTempral.derecho,expresionTempral.izquierdo,expresionTempral.tipo,expresionTempral.noFila,expresionTempral.noColumna,expresionTempral.simbol.tipo,expresionTempral.simbol.valor,null,null,expresionTempral.ambiente)
             
-            if (expresionTempral.izquierdo?.simbol !=null) expresionTempral.izquierdo.simbol = new simbolo(izquierdo.tipo,izquierdo.valor)
-            if(expresionTempral.derecho?.simbol!=null) expresionTempral.derecho.simbol = new simbolo(derecho.tipo,derecho.valor)
+            //if (expresionTempral.izquierdo?.simbol !=null) expresionTempral.izquierdo.simbol = new simbolo(izquierdo.tipo,izquierdo.valor)
+            //if(expresionTempral.derecho?.simbol!=null) expresionTempral.derecho.simbol = new simbolo(derecho.tipo,derecho.valor)
             //console.log("--------------------------")
             //console.log(expresionTempral)
             //console.log("--------------------------")
-            i++;
-        }
-        //console.log(this.ambiente)
+            */
+           this.condicional.ejecutar()
+           while(this.condicional.simbol.getValor()=="true"){
+            this.ambiente.ejecutarAmbiente()
+            this.condicional.ejecutar()
+            console.log(this.condicional.simbol)
+           }
     }
 }
