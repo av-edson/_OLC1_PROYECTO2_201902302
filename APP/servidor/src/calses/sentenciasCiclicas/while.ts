@@ -1,9 +1,6 @@
 import { instruccion } from "../../Enviroment/instruccion";
-import { Ambiente, Nodo } from "../../Enviroment/enviroment";
-import { simbolo,tipoDatos } from "../../Enviroment/simbolos";
-import{tipoExpresion,expresion} from "./../expresiones/expresion"
-import {Grammar} from "../../controllers/Grammar"
-import {Error}  from "../../calses/error"
+import { Ambiente } from "../../Enviroment/enviroment";
+import{expresion} from "./../expresiones/expresion"
 
 export class WhileSentencia implements instruccion {
     private noLinea:number;
@@ -49,7 +46,6 @@ export class WhileSentencia implements instruccion {
            while(this.condicional.simbol.getValor()=="true"){
             this.ambiente.ejecutarAmbiente()
             this.condicional.ejecutar()
-            console.log(this.condicional.simbol)
            }
     }
 }

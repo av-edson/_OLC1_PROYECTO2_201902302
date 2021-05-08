@@ -39,7 +39,6 @@ class WhileSentencia {
         while (this.condicional.simbol.getValor() == "true") {
             this.ambiente.ejecutarAmbiente();
             this.condicional.ejecutar();
-            console.log(this.condicional.simbol);
         }
     }
 }

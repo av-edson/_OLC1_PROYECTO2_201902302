@@ -37,8 +37,7 @@ export class Declaracion implements instruccion{
             this.tipoDato = this.expresionDef.simbol.tipo
             this.valor = this.expresionDef.simbol.getValor()
             this.expresionDef.ambiente.editarSimbolo(this.identificador,this.fila,this.columna,this.expresionDef)
-        }
-        else{
+        }else{
             this.tipoDato=tipoDatos.error;
             Grammar.listaErrores.push(new Error("Error semantico","Asignacion Incorrecta",this.fila,this.columna))
             Grammar.consola+= " ->Error semantico en asignacion linea: "+this.fila+" columna: "+this.columna+"\n";

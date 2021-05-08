@@ -11,6 +11,7 @@ const If = require("./calses/sentenciasControl/sentenciaIF") // clase IF
 const elif = require("./calses/sentenciasControl/sentenciaElif") // clase ELIF
 const Switch = require("./calses/sentenciasControl/SwitchSentencia") //clase SWITCH
 const While = require("./calses/sentenciasCiclicas/while") // clase while
+const For = require("./calses/sentenciasCiclicas/cicloFor") // clase For
 var err;
 var simAux;
 var ambAux =controllador.Grammar.ambienteGlobal;
@@ -78,7 +79,8 @@ var listIf = [];
 "break"         return 'break';
 "default"       return 'default'; 
 /* ciclos */
-"while"         return "while"      
+"while"         return "while"   
+"for"           return "for";  
 /* datos */
 [0-9]+("."[0-9]+)\b       return 'decimal';
 [0-9]+\b                    return 'entero';
@@ -124,7 +126,7 @@ BLOQUE_SENTENCIAS: llave_abre INSTRUCCIONES llave_cierra { }
 
 INSTRUCCION: ASIGNACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstruccion($1);}
             |DECLARACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstruccion($1);}
-            |MODIFICADOR{ambAux.agregarInstruccion($1);}
+            |MODIFICADOR punto_coma{ambAux.agregarInstruccion($1);}
             |LLAMADA_FUNCION
             |SENTENCIA_CICLICA{ambAux.agregarInstruccion($1);}
             |SENTENCIA_CONTROL {ambAux.agregarInstruccion($1);}
@@ -182,9 +184,9 @@ TIPO_DATO: def_entero {$$ = new S.simbolo(S.tipoDatos.entero,null);}
             |def_cadena{$$ = new S.simbolo(S.tipoDatos.cadena,null);}
             |def_boolean{$$ = new S.simbolo(S.tipoDatos.booleano,null);};
 
-MODIFICADOR: identificador incremento punto_coma{$1=new E.expresion(null,null,E.tipoExpresion.identificador,@1.first_line,@1.first_column,null,String($1),null,null,ambAux);
+MODIFICADOR: identificador incremento{$1=new E.expresion(null,null,E.tipoExpresion.identificador,@1.first_line,@1.first_column,null,String($1),null,null,ambAux);
 $$ = new E.expresion(null,$1,E.tipoExpresion.incremento,@1.first_line,@2.first_column,null,null,null,null,ambAux); }
-        |identificador decremento punto_coma{$1=new E.expresion(null,null,E.tipoExpresion.identificador,@1.first_line,@1.first_column,null,String($1),null,null,ambAux);
+        |identificador decremento {$1=new E.expresion(null,null,E.tipoExpresion.identificador,@1.first_line,@1.first_column,null,String($1),null,null,ambAux);
 $$ = new E.expresion(null,$1,E.tipoExpresion.decremento,@2.first_line,@2.first_column,null,null,null,null,ambAux); };
 
 SENTENCIA_CONTROL: IF BLOQUE_SENTENCIAS else IF BLOQUE_SENTENCIAS ELIF {let eli=new elif.Elif(@1.first_line,@1.first_column);
@@ -221,9 +223,18 @@ DEFAULT: default dos_puntos {ambAux=new Amb.Ambiente(ambAux,"case "+listIf.lengt
         $$.siDefault()};
 
 SENTENCIA_CICLICA: SENTENCIA_WHILE{$$=$1}
-                | SENTENCIA_FOR{};
+                | SENTENCIA_FOR{$$=$1};
 
 SENTENCIA_WHILE: WHILE BLOQUE_SENTENCIAS{$$=$1;ambAux=ambAux.getPadre()};
 
 WHILE: while par_abre EXPRESION par_cierra{ambAux = new Amb.Ambiente(ambAux,"Ciclo While");
                 $$=new While.WhileSentencia(@1.first_line,@1.first_column,$3,ambAux);};
+
+SENTENCIA_FOR: ENCABEZADOFOR BLOQUE_SENTENCIAS{$$=$1;ambAux=ambAux.getPadre()};
+
+ENCABEZADOFOR:    FOR ASIGNACION punto_coma EXPRESION punto_coma MODIFICADOR par_cierra {
+        $$=new For.Ciclo_For(@1.first_line,@1.first_column,$2,$4,$6,ambAux);}
+        |FOR ASIGNACION punto_coma EXPRESION punto_coma ASIGNACION par_cierra{
+        $$=new For.Ciclo_For(@1.first_line,@1.first_column,$2,$4,$6,ambAux);};
+
+FOR: for par_abre{ambAux = new Amb.Ambiente(ambAux,"Ciclo For");};
