@@ -23,14 +23,14 @@ export class IfSentence implements instruccion{
     ejecutar(){
         //ejecutar la condicional
         this.condicional.ejecutar()
-        if (this.condicional.simbol.tipo == tipoDatos.booleano) {
+        if (this.condicional.simbol.tipo == tipoDatos.booleano && this.condicional.tipo !=tipoExpresion.identificador ) {
             if (this.condicional.simbol.getValor()=="true") {
                 this.ambiente.ejecutarAmbiente()
             }else{
                 if (this.elseSentencia!=null) {
                     this.elseSentencia.ejecutar()
                 }
-                return
+                return 
             }
         }else if (this.condicional.tipo == tipoExpresion.identificador || this.condicional.tipo == tipoExpresion.funcion) {
             let variable:Nodo = this.ambiente.buscarEnTabla(this.condicional.simbol.getValor(),this.noColumna,this.noColumna)

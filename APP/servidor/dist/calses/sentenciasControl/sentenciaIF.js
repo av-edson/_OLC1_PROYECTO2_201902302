@@ -16,7 +16,7 @@ class IfSentence {
     ejecutar() {
         //ejecutar la condicional
         this.condicional.ejecutar();
-        if (this.condicional.simbol.tipo == simbolos_1.tipoDatos.booleano) {
+        if (this.condicional.simbol.tipo == simbolos_1.tipoDatos.booleano && this.condicional.tipo != expresion_1.tipoExpresion.identificador) {
             if (this.condicional.simbol.getValor() == "true") {
                 this.ambiente.ejecutarAmbiente();
             }

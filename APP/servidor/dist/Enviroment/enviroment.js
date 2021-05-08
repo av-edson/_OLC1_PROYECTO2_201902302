@@ -7,6 +7,7 @@ const expresion_1 = require("../calses/expresiones/expresion");
 const Grammar_1 = require("../controllers/Grammar");
 const simbolos_1 = require("./simbolos");
 const SwitchSentencia_1 = require("../calses/sentenciasControl/SwitchSentencia");
+const Metodos_1 = require("../calses/Funciones/Metodos");
 class Ambiente {
     constructor(padre, nombre) {
         this.tablaSimbolos = [];
@@ -20,6 +21,7 @@ class Ambiente {
     limpiarListas() {
         this.tablaSimbolos = [];
         this.listaInstrucciones = [];
+        this.tablaSimbolos2 = [];
     }
     getAmbienteGlobal() {
         var aux = this;
@@ -53,6 +55,12 @@ class Ambiente {
     agregarSimbolo(agregado) {
         if (agregado instanceof Declaracion_1.Declaracion) {
             let aux = new Nodo(agregado.tipo, agregado.fila, agregado.columna, new simbolos_1.simbolo(agregado.tipoDato, agregado.valor), agregado.entorno, agregado.identificador);
+            this.tablaSimbolos.push(aux);
+        }
+        else if (agregado instanceof Metodos_1.Metodo) {
+            var simAux = new simbolos_1.simbolo(simbolos_1.tipoDatos.funcion, null);
+            let aux = new Nodo(expresion_1.tipoExpresion.funcion, agregado.getLine(), agregado.getColumn(), simAux, agregado.ambiente, agregado.identificador);
+            aux.setParametros(agregado.listaParametos);
             this.tablaSimbolos.push(aux);
         }
     }
@@ -176,6 +184,14 @@ class Nodo {
         this.entorno = entorno;
         this.valor = sim.getValor();
         this.identificador = identificador;
+        this.parametos = [];
+    }
+    setParametros(lista) {
+        if (this.tipo == "funcion") {
+            lista.forEach(element => {
+                this.parametos.push(element);
+            });
+        }
     }
 }
 exports.Nodo = Nodo;

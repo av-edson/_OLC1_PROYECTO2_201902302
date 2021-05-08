@@ -48,6 +48,7 @@ export enum tipoDatos {
     cadena,
     caracter,
     booleano,
+    funcion,
     nulo,
     error
   }

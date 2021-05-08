@@ -6,6 +6,7 @@ import { simbolo, tipoDatos } from "./simbolos";
 import {tablaSimbolosModel} from "../models/tabla-simbolos"
 import { instruccion } from "./instruccion";
 import { SentenciaBreack } from "../calses/sentenciasControl/SwitchSentencia";
+import { LlamarMetodo, Metodo, Parametro } from "../calses/Funciones/Metodos";
 export class Ambiente {
     public tablaSimbolos:Array<Nodo>;
     public tablaSimbolos2:Array<Nodo>;
@@ -27,6 +28,7 @@ export class Ambiente {
     public limpiarListas(){
         this.tablaSimbolos = []
         this.listaInstrucciones = []
+        this.tablaSimbolos2=[]
     }
     public getAmbienteGlobal():Ambiente|null{
         var aux:Ambiente = this;
@@ -60,9 +62,15 @@ export class Ambiente {
             this.listaInstrucciones.push(agregado)
         }      
     }
-    public agregarSimbolo(agregado:Declaracion){
+    public agregarSimbolo(agregado:Declaracion|Metodo){
         if (agregado instanceof Declaracion) {
             let aux:Nodo = new Nodo(agregado.tipo,agregado.fila,agregado.columna,new simbolo(agregado.tipoDato,agregado.valor),agregado.entorno,agregado.identificador)
+            this.tablaSimbolos.push(aux)
+        }
+        else if (agregado instanceof Metodo) {
+            var simAux = new simbolo(tipoDatos.funcion,null)
+            let aux:Nodo = new Nodo(tipoExpresion.funcion,agregado.getLine(),agregado.getColumn(),simAux,agregado.ambiente,agregado.identificador)
+            aux.setParametros(agregado.listaParametos)
             this.tablaSimbolos.push(aux)
         }
     }
@@ -160,7 +168,7 @@ export class Ambiente {
         });
         return salida;
     }
-
+ 
     public ejecutarAmbiente(){
         for (let i = 0; i < this.listaInstrucciones.length; i++) {
             const element = this.listaInstrucciones[i];
@@ -177,7 +185,7 @@ export class Ambiente {
                 }
             }   
             element.ejecutar(null)
-        }
+        } 
         this.agregarHijos()
     }
 }
@@ -200,6 +208,7 @@ export class Nodo implements encabezadoSimbolos{
     linea: number;
     columna: number;
     valor: any;
+    parametos:Array<Parametro>
     constructor(tipo:tipoExpresion,fila:number,columna:number,sim:simbolo,entorno:Ambiente,identificador:string){
         this.tipo = tipoExpresion[tipo];
         this.linea = fila;
@@ -208,5 +217,13 @@ export class Nodo implements encabezadoSimbolos{
         this.entorno=entorno;
         this.valor=sim.getValor();
         this.identificador=identificador;
+        this.parametos=[]
+    }
+    public setParametros(lista:Array<Parametro>){
+        if (this.tipo == "funcion") {
+            lista.forEach(element => {
+                this.parametos.push(element)
+            });
+        }
     }
 }
