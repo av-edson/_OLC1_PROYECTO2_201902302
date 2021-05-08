@@ -197,9 +197,9 @@ $$ = new E.expresion(null,$1,E.tipoExpresion.incremento,@1.first_line,@2.first_c
 $$ = new E.expresion(null,$1,E.tipoExpresion.decremento,@2.first_line,@2.first_column,null,null,null,null,ambAux); };
 
 SENTENCIA_CONTROL: IF BLOQUE_SENTENCIAS else IF BLOQUE_SENTENCIAS ELIF {let eli=new elif.Elif(@1.first_line,@1.first_column);
-                eli.agregarInicial($1); eli.agregarIf($4); eli.agregarSentencias(listIf); ambAux=ambAux.getPadre(); $$=eli; listIf=[]} 
-                |IF BLOQUE_SENTENCIAS {$$=$1;ambAux=ambAux.getPadre()} 
-                |IF BLOQUE_SENTENCIAS ELSE BLOQUE_SENTENCIAS {$$=$1;$$.agregarElse($3) ;ambAux=ambAux.getPadre()}
+                eli.agregarInicial($1); eli.agregarIf($4); eli.agregarSentencias(listIf);; ambAux=ambAux.getPadre(); $$=eli; listIf=[]} 
+                |IF BLOQUE_SENTENCIAS {$$=$1;;ambAux=ambAux.getPadre()} 
+                |IF BLOQUE_SENTENCIAS ELSE BLOQUE_SENTENCIAS {$$=$1;$$.agregarElse($3) ;;ambAux=ambAux.getPadre()}
                 |CONTROL_SWITCH {listIf=[]};
 
 IF: if par_abre EXPRESION par_cierra{ambAux = new Amb.Ambiente(ambAux,"Sentencia IF"); $$ =new If.IfSentence(@1.first_line,@1.first_column,$3,ambAux);};

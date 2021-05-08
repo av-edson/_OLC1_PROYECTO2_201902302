@@ -18,7 +18,7 @@ const compilarEntrada = (req, res) => {
         res.json({
             mensaje: Grammar_1.Grammar.consola,
             errores: Grammar_1.Grammar.listaErrores,
-            simbolos: Grammar_1.Grammar.ambienteGlobal.getTablaSimbolos()
+            simbolos: Grammar_1.Grammar.ambienteGlobal.getTablaSimbolos2()
         });
     }
     catch (error) {

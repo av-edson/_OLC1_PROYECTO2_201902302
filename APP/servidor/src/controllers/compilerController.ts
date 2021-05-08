@@ -21,7 +21,7 @@ export const compilarEntrada = (req:Request, res:Response) => {
         res.json({
             mensaje: Grammar.consola,
             errores: Grammar.listaErrores,
-            simbolos:Grammar.ambienteGlobal.getTablaSimbolos()
+            simbolos:Grammar.ambienteGlobal.getTablaSimbolos2()
         })
     } catch (error) {
         console.log(error)

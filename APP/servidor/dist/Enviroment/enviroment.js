@@ -15,6 +15,7 @@ class Ambiente {
         this.listaInstrucciones = [];
         this.estaEnCiclo = false;
         this.encicloBreak = false;
+        this.tablaSimbolos2 = [];
     }
     limpiarListas() {
         this.tablaSimbolos = [];
@@ -56,9 +57,19 @@ class Ambiente {
         }
     }
     agregarHijos() {
-        this.tablaSimbolos.forEach(element => {
+        this.agregarMismos();
+        this.tablaSimbolos2.forEach(element => {
             if (this.ambientePadre != null) {
-                this.ambientePadre.tablaSimbolos.push(element);
+                if (this.ambientePadre.buscarEnTabla2(element.identificador) == false) {
+                    this.ambientePadre.tablaSimbolos2.push(element);
+                }
+            }
+        });
+    }
+    agregarMismos() {
+        this.tablaSimbolos.forEach(element => {
+            if (this.buscarEnTabla2(element.identificador) == false) {
+                this.tablaSimbolos2.push(element);
             }
         });
     }
@@ -77,6 +88,21 @@ class Ambiente {
         }
         return new Nodo(expresion_1.tipoExpresion.nulo, fila, columna, new simbolos_1.simbolo(simbolos_1.tipoDatos.nulo, null), this, nombre);
     }
+    buscarEnTabla2(nombre) {
+        nombre = nombre.toLowerCase();
+        var aux = this;
+        while (aux != null) {
+            for (let i = 0; i < aux.tablaSimbolos2.length; i++) {
+                const element = aux.tablaSimbolos2[i];
+                if (element.identificador == nombre) {
+                    return true;
+                    break;
+                }
+            }
+            aux = aux.ambientePadre;
+        }
+        return false;
+    }
     editarSimbolo(nombre, fila, columna, nuevo) {
         var temporal = this.buscarEnTabla(nombre, fila, columna);
         if (temporal.tipo_dato == nuevo.simbol.tipo) {
@@ -91,6 +117,22 @@ class Ambiente {
     getTablaSimbolos() {
         var salida = [];
         this.tablaSimbolos.forEach(element => {
+            let aux = {
+                identificador: String(element.identificador),
+                tipo: String(element.tipo),
+                tipo_dato: String(simbolos_1.tipoDatos[Number(element.tipo_dato)]),
+                entorno: String(element.entorno.getNombreAmbiente()),
+                linea: String(element.linea),
+                columna: String(element.columna),
+                valor: String(element.valor)
+            };
+            salida.push(aux);
+        });
+        return salida;
+    }
+    getTablaSimbolos2() {
+        var salida = [];
+        this.tablaSimbolos2.forEach(element => {
             let aux = {
                 identificador: String(element.identificador),
                 tipo: String(element.tipo),
@@ -121,6 +163,7 @@ class Ambiente {
             }
             element.ejecutar(null);
         }
+        this.agregarHijos();
     }
 }
 exports.Ambiente = Ambiente;

@@ -237,13 +237,13 @@ this.$ = new E.expresion(null,$$[$0-1],E.tipoExpresion.decremento,_$[$0].first_l
 break;
 case 58:
 let eli=new elif.Elif(_$[$0-5].first_line,_$[$0-5].first_column);
-                eli.agregarInicial($$[$0-5]); eli.agregarIf($$[$0-2]); eli.agregarSentencias(listIf); ambAux=ambAux.getPadre(); this.$=eli; listIf=[]
+                eli.agregarInicial($$[$0-5]); eli.agregarIf($$[$0-2]); eli.agregarSentencias(listIf);; ambAux=ambAux.getPadre(); this.$=eli; listIf=[]
 break;
-case 59: case 79: case 81:
-this.$=$$[$0-1];ambAux=ambAux.getPadre()
+case 59:
+this.$=$$[$0-1];;ambAux=ambAux.getPadre()
 break;
 case 60:
-this.$=$$[$0-3];this.$.agregarElse($$[$0-1]) ;ambAux=ambAux.getPadre()
+this.$=$$[$0-3];this.$.agregarElse($$[$0-1]) ;;ambAux=ambAux.getPadre()
 break;
 case 61:
 listIf=[]
@@ -295,6 +295,9 @@ this.$=$$[$0]
 break;
 case 78:
 this.$=$$[$0];ambAux=ambAux.getPadre()
+break;
+case 79: case 81:
+this.$=$$[$0-1];ambAux=ambAux.getPadre()
 break;
 case 80:
 ambAux = new Amb.Ambiente(ambAux,"Ciclo While");

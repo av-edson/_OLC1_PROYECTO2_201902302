@@ -8,6 +8,7 @@ import { instruccion } from "./instruccion";
 import { SentenciaBreack } from "../calses/sentenciasControl/SwitchSentencia";
 export class Ambiente {
     public tablaSimbolos:Array<Nodo>;
+    public tablaSimbolos2:Array<Nodo>;
     private ambientePadre:Ambiente|null;
     private listaInstrucciones:Array<instruccion>;
     private nombreAmbiente:string;
@@ -20,6 +21,7 @@ export class Ambiente {
         this.listaInstrucciones = [];
         this.estaEnCiclo = false
         this.encicloBreak=false;
+        this.tablaSimbolos2 = []
     }
  
     public limpiarListas(){
@@ -66,9 +68,20 @@ export class Ambiente {
     }
 
     public agregarHijos(){
-        this.tablaSimbolos.forEach(element => {
+        this.agregarMismos()
+        this.tablaSimbolos2.forEach(element => {
             if (this.ambientePadre != null) {
-                this.ambientePadre.tablaSimbolos.push(element)
+                if (this.ambientePadre.buscarEnTabla2(element.identificador)==false) {
+                    this.ambientePadre.tablaSimbolos2.push(element)
+                }
+            }
+        });
+    }
+
+    private agregarMismos(){
+        this.tablaSimbolos.forEach(element => {
+            if (this.buscarEnTabla2(element.identificador)==false) {
+                this.tablaSimbolos2.push(element)
             }
         });
     }
@@ -88,6 +101,21 @@ export class Ambiente {
         }
         return new Nodo(tipoExpresion.nulo,fila,columna,new simbolo(tipoDatos.nulo,null),this,nombre);
     }
+    public buscarEnTabla2(nombre:string):boolean{
+        nombre = nombre.toLowerCase();
+        var aux:Ambiente|null = this;
+        while(aux != null){
+            for (let i = 0; i < aux.tablaSimbolos2.length; i++) {
+                const element = aux.tablaSimbolos2[i];
+                if (element.identificador == nombre) {
+                    return true
+                    break  
+                }
+            }
+            aux = aux.ambientePadre;
+        }
+        return false;
+    }
 
     public editarSimbolo(nombre:string,fila:number,columna:number, nuevo:expresion){
         var temporal = this.buscarEnTabla(nombre,fila,columna)
@@ -103,6 +131,22 @@ export class Ambiente {
     public getTablaSimbolos():Array<tablaSimbolosModel>{
         var salida:Array<tablaSimbolosModel>=[];
         this.tablaSimbolos.forEach(element => {
+            let aux:tablaSimbolosModel = {
+                identificador:String(element.identificador),
+                tipo:String(element.tipo),
+                tipo_dato:String(tipoDatos[Number(element.tipo_dato)]),
+                entorno:String(element.entorno.getNombreAmbiente()),
+                linea:String(element.linea),
+                columna:String(element.columna),
+                valor:String(element.valor)
+            }
+            salida.push(aux)
+        });
+        return salida;
+    }
+    public getTablaSimbolos2():Array<tablaSimbolosModel>{
+        var salida:Array<tablaSimbolosModel>=[];
+        this.tablaSimbolos2.forEach(element => {
             let aux:tablaSimbolosModel = {
                 identificador:String(element.identificador),
                 tipo:String(element.tipo),
@@ -134,6 +178,7 @@ export class Ambiente {
             }   
             element.ejecutar(null)
         }
+        this.agregarHijos()
     }
 }
 
