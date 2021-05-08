@@ -107,11 +107,6 @@ class Ambiente {
     ejecutarAmbiente() {
         for (let i = 0; i < this.listaInstrucciones.length; i++) {
             const element = this.listaInstrucciones[i];
-            //if (this.estaEnCiclo==true && element instanceof SentenciaBreack) {
-            //    element.ejecutar()
-            //    this.encicloBreak=true
-            //    break;
-            //}
             if (element instanceof SwitchSentencia_1.SentenciaBreack) {
                 element.ejecutar();
                 if (this.estaEnCiclo) {

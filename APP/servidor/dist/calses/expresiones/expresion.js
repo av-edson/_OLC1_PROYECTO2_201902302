@@ -41,6 +41,10 @@ class expresion {
                 }
             }
         }
+        // if (this.ambiente == null && this.tipo ==tipoExpresion.identificador) {
+        //     console.log('-------aca--------'+this.noFila+" "+this.noColumna)
+        //     console.log(this.simbol)
+        // }
     }
     setTipoSimbolo(variable, valor) {
         switch (variable.tipo_dato) {

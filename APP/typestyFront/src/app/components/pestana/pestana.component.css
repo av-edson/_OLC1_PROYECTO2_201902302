@@ -8,6 +8,7 @@ article{
 .consola{
     float: right;
     margin-right: 150px;
+    min-height: 600px;
 }
 h1{
     text-align: center;

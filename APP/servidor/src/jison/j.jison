@@ -13,6 +13,7 @@ const Switch = require("./calses/sentenciasControl/SwitchSentencia") //clase SWI
 const While = require("./calses/sentenciasCiclicas/while") // clase while
 const For = require("./calses/sentenciasCiclicas/cicloFor") // clase For
 const DoWhile = require("./calses/sentenciasCiclicas/dowhile") // clase DoWhile
+const Funciones = require("./calses/Funciones/Funciones") // clase Funciones
 var err;
 var simAux;
 var ambAux =controllador.Grammar.ambienteGlobal;
@@ -73,6 +74,7 @@ var listIf = [];
 [ \r\t]     {};
 \n          {};
 // palabras reservadas
+"continue"      return 'continue';
 "if"            return 'if';
 "else"          return 'else';
 "switch"        return 'switch';
@@ -131,7 +133,8 @@ BLOQUE_SENTENCIAS: llave_abre INSTRUCCIONES llave_cierra { }
 INSTRUCCION: ASIGNACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstruccion($1);}
             |DECLARACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstruccion($1);}
             |MODIFICADOR punto_coma{ambAux.agregarInstruccion($1);}
-            |LLAMADA_FUNCION
+            |LLAMADA_FUNCION punto_coma{ambAux.agregarInstruccion($1);}
+            |NO_IMPLEMENTADAS
             |SENTENCIA_CICLICA{ambAux.agregarInstruccion($1);}
             |SENTENCIA_CONTROL {ambAux.agregarInstruccion($1);}
             |break punto_coma{ambAux.agregarInstruccion(new Switch.SentenciaBreack(@1.first_line,@1.first_column,ambAux));}
@@ -152,7 +155,7 @@ ASIGNACION: identificador op_igual EXPRESION {$$=new Asig.Asignacion(@1.first_li
 EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExpresion.multiplicacion,@2.first_line,@2.first_column,null,null,null,null,ambAux);}
             |par_abre TIPO_DATO par_cierra  EXPRESION{$$ = new E.expresion(null,$4,E.tipoExpresion.casteo,@2.first_line,@2.first_column,null,null,null,$2,ambAux);}
             |EXPRESION suma EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.suma,@2.first_line,@2.first_column,null,null,null,null,ambAux);}
-            |EXPRESION resta EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.resta,@2.first_line,@2.first_column,null,null,null,null);}           
+            |EXPRESION resta EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.resta,@2.first_line,@2.first_column,null,null,null,null,ambAux);}           
             |EXPRESION multiplicacion EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.multiplicacion,@2.first_line,@2.first_column,null,null,null,null,ambAux);}
             |EXPRESION division EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.division,@2.first_line,@2.first_column,null,null,null,null,ambAux);}
             |EXPRESION potencia EXPRESION{ $$ = new E.expresion($3,$1,E.tipoExpresion.potencia,@2.first_line,@2.first_column,null,null,null,null,ambAux);}
@@ -180,7 +183,7 @@ DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,@1.first_
         |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,@1.first_line,@1.first_column,S.tipoDatos.booleano,String($1),null,null,ambAux);}
         |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,@1.first_line,@1.first_column,S.tipoDatos.cadena,String($1).slice(1,-1),null,null,ambAux);}
         |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,@1.first_line,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1),null,null,ambAux);}
-        |identificador{$$=new E.expresion(null,null,E.tipoExpresion.identificador,@1.first_line,@1.first_column,null,String($1),null,null,null,ambAux)};
+        |identificador{$$=new E.expresion(null,null,E.tipoExpresion.identificador,@1.first_line,@1.first_column,null,String($1),null,null,ambAux)};
 
 TIPO_DATO: def_entero {$$ = new S.simbolo(S.tipoDatos.entero,null);}
             |def_decimal{$$ = new S.simbolo(S.tipoDatos.decimal,null);}
@@ -247,3 +250,10 @@ FOR: for par_abre{ambAux = new Amb.Ambiente(ambAux,"Ciclo For");};
 SENTENCIA_DOWHILE: DO BLOQUE_SENTENCIAS while par_abre EXPRESION par_cierra punto_coma{$$=new DoWhile.doWhile(@1.first_line,@1.first_column,$5,ambAux);};
 
 DO:do {ambAux = new Amb.Ambiente(ambAux,"Ciclo Do-While");};
+
+// ----------------------------- FUNCIONES -----------------------
+LLAMADA_FUNCION: FUNCION_PRINT{$$=$1};
+
+FUNCION_PRINT: print par_abre EXPRESION par_cierra {$$ = new Funciones.PrintF(@1.first_line,@1.first_column,$3,ambAux);};
+// ----------------------- NO IMPLEMENTADAS
+NO_IMPLEMENTADAS: continue{};

@@ -49,7 +49,11 @@ export class expresion implements instruccion{
                 }
             }
         }
-    }
+       // if (this.ambiente == null && this.tipo ==tipoExpresion.identificador) {
+       //     console.log('-------aca--------'+this.noFila+" "+this.noColumna)
+       //     console.log(this.simbol)
+       // }
+    } 
 
     private setTipoSimbolo(variable:Nodo,valor:string){
         switch (variable.tipo_dato) {
