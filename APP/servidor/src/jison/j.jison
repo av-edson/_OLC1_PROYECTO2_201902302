@@ -10,6 +10,7 @@ const Asig = require("./calses/manejoVariables/asignacion") // clase asignacion
 const If = require("./calses/sentenciasControl/sentenciaIF") // clase IF
 const elif = require("./calses/sentenciasControl/sentenciaElif") // clase ELIF
 const Switch = require("./calses/sentenciasControl/SwitchSentencia") //clase SWITCH
+const While = require("./calses/sentenciasCiclicas/while") // clase while
 var err;
 var simAux;
 var ambAux =controllador.Grammar.ambienteGlobal;
@@ -75,7 +76,9 @@ var listIf = [];
 "switch"        return 'switch';
 "case"          return 'case';
 "break"         return 'break';
-"default"       return 'default';       
+"default"       return 'default'; 
+/* ciclos */
+"while"         return "while"      
 /* datos */
 [0-9]+("."[0-9]+)\b       return 'decimal';
 [0-9]+\b                    return 'entero';
@@ -123,6 +126,7 @@ INSTRUCCION: ASIGNACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstr
             |DECLARACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstruccion($1);}
             |MODIFICADOR{ambAux.agregarInstruccion($1);}
             |LLAMADA_FUNCION
+            |SENTENCIA_CICLICA{ambAux.agregarInstruccion($1);}
             |SENTENCIA_CONTROL {ambAux.agregarInstruccion($1);}
             |break punto_coma{ambAux.agregarInstruccion(new Switch.SentenciaBreack(@1.first_line,@1.first_column,ambAux));}
             |ASIGNACION{ err = new Err.Error("Error Sintactico","Se esperaba un ; para cerrar la sentencia cerca de:"+ yytext,this._$.first_line,this._$.last_column); controllador.Grammar.listaErrores.push(err); 
@@ -215,3 +219,11 @@ DEFAULTS: DEFAULT INSTRUCCIONES {$$=$1; ambAux = ambAux.getPadre();listIf.push($
 DEFAULT: default dos_puntos {ambAux=new Amb.Ambiente(ambAux,"case "+listIf.length);
         $$=new Switch.CaseSentencia(@1.first_line,@1.first_column,null,ambAux);
         $$.siDefault()};
+
+SENTENCIA_CICLICA: SENTENCIA_WHILE{$$=$1}
+                | SENTENCIA_FOR{};
+
+SENTENCIA_WHILE: WHILE BLOQUE_SENTENCIAS{$$=$1;ambAux=ambAux.getPadre()};
+
+WHILE: while par_abre EXPRESION par_cierra{ambAux = new Amb.Ambiente(ambAux,"Ciclo While");
+                $$=new While.WhileSentencia(@1.first_line,@1.first_column,$3,ambAux);};

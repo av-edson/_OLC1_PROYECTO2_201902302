@@ -75,15 +75,23 @@ export class expresion implements instruccion{
     }
     
     ejecutar(){ 
+        let simboloDerecho ;
+        let simboloIzquierdo;
         if (this.izquierdo != null) {
             this.izquierdo.ejecutar()
+            simboloIzquierdo = new expresion(this.izquierdo.derecho,this.izquierdo.izquierdo,this.izquierdo.tipo,this.izquierdo.noFila,this.izquierdo.noColumna,this.izquierdo.simbol.tipo,this.izquierdo.simbol.valor,this.izquierdo.ternario,null,this.izquierdo.ambiente)
+            simboloIzquierdo.simbol = new simbolo(this.izquierdo.simbol.tipo,this.izquierdo.simbol.valor)
+        }else{
+            simboloIzquierdo = this.izquierdo
         }
         if (this.derecho != null) {
             this.derecho.ejecutar()
+            simboloDerecho = new expresion(this.derecho.derecho,this.derecho.izquierdo,this.derecho.tipo,this.derecho.noFila,this.derecho.noColumna,this.derecho.simbol.tipo,this.derecho.simbol.valor,this.derecho.ternario,null,this.derecho.ambiente)
+            simboloDerecho.simbol = new simbolo(this.derecho.simbol.tipo,this.derecho.simbol.valor)
+        }else{
+            simboloDerecho = this.derecho
         }
         let cast = new Casteo();
-        let simboloDerecho = this.derecho;
-        let simboloIzquierdo = this.izquierdo;
         var nombreVariable="";
         var teneario:string="";var casteo; var izq:string="";var der:string="";
         // ------------------------
@@ -103,6 +111,8 @@ export class expresion implements instruccion{
         switch (this.tipo) {
             case tipoExpresion.suma:
                 console.log("entro expresion")
+                console.log(simboloIzquierdo)
+                console.log(simboloDerecho)
                 this.simbol = this.operacionAritmetica(simboloDerecho,simboloIzquierdo,1);
                 break;
             case tipoExpresion.resta:

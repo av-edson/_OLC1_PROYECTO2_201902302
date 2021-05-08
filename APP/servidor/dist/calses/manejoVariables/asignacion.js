@@ -9,8 +9,9 @@ class Asignacion {
         this.ideVariable = identificador.toLocaleLowerCase();
     }
     ejecutar() {
-        console.log("asignando " + this.ideVariable);
+        //console.log("asignando "+this.ideVariable+" "+this.expre.simbol.tipo)
         this.expre.ejecutar();
+        //console.log(this.expre.simbol.tipo)
         this.expre.ambiente.editarSimbolo(this.ideVariable, this.noColumna, this.noColumna, this.expre);
     }
     getColumn() {
