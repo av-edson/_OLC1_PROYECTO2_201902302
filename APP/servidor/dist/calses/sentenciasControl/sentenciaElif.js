@@ -9,6 +9,16 @@ class Elif {
         this.ifInicial = null;
         this.listaIfs = [];
     }
+    getIfs() {
+        var temp = [];
+        if (this.ifInicial != null) {
+            temp.push(this.ifInicial);
+        }
+        this.listaIfs.forEach(element => {
+            temp.push(element);
+        });
+        return temp;
+    }
     agregarSentencias(listas) {
         for (let i = 0; i < listas.length; i++) {
             const element = listas[i];

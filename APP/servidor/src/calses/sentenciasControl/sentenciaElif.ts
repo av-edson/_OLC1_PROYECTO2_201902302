@@ -13,6 +13,17 @@ export class Elif  implements instruccion{
         this.listaIfs=[]
     }
 
+    public getIfs():Array<IfSentence|SentenciaElse>{
+        var temp:Array<IfSentence|SentenciaElse>=[]
+        if (this.ifInicial != null) {
+            temp.push(this.ifInicial)
+        }
+        this.listaIfs.forEach(element => {
+            temp.push(element)
+        });
+        return temp
+    }
+
     public agregarSentencias(listas:Array<IfSentence|SentenciaElse>){
         for (let i = 0; i < listas.length; i++) {
             const element = listas[i];

@@ -83,6 +83,8 @@ var listIf = [];
 "while"         return "while"   
 "for"           return "for";  
 "do"            return "do";
+/* funciones nativas */
+"print"         return "print";
 /* datos */
 [0-9]+("."[0-9]+)\b       return 'decimal';
 [0-9]+\b                    return 'entero';

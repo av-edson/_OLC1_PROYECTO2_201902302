@@ -90,9 +90,12 @@ class SentenciaBreack {
         this.ambiente = ambiente;
     }
     ejecutar() {
+        var _a;
         if (this.ambiente.enciclado() == false) {
-            Grammar_1.Grammar.listaErrores.push(new error_1.Error("Error Sintáctico", "No se esperaba este brack, fuera de ambiente", this.noLinea, this.noColumna));
-            Grammar_1.Grammar.consola += "Sentencia brack fuera de ambito en linea" + this.noLinea + " columna " + this.noColumna + "\n";
+            if (!((_a = this.ambiente.getPadre()) === null || _a === void 0 ? void 0 : _a.estaEnCiclo)) {
+                Grammar_1.Grammar.listaErrores.push(new error_1.Error("Error Sintáctico", "No se esperaba este brack, fuera de ambiente", this.noLinea, this.noColumna));
+                Grammar_1.Grammar.consola += "Sentencia brack fuera de ambito en linea" + this.noLinea + " columna " + this.noColumna + "\n";
+            }
         }
     }
     getColumn() {

@@ -3,6 +3,8 @@ import { Ambiente } from "../../Enviroment/enviroment";
 import{expresion} from "./../expresiones/expresion"
 import { Declaracion } from "../manejoVariables/Declaracion";
 import { Asignacion } from "../manejoVariables/asignacion";
+import { IfSentence } from "../sentenciasControl/sentenciaIF";
+import { Elif } from "../sentenciasControl/sentenciaElif";
 
 export class Ciclo_For implements instruccion {
     private noLinea:number;
@@ -28,6 +30,7 @@ export class Ciclo_For implements instruccion {
     }
 
     ejecutar(){
+        this.ambiente.estaEnCiclo = true;
         if (this.inicial instanceof Declaracion) {
             this.ambiente.agregarSimbolo(this.inicial)
             this.inicial.ejecutar();
@@ -41,6 +44,10 @@ export class Ciclo_For implements instruccion {
             // modificador
             this.actualizacion.ejecutar()
             this.condicional.ejecutar()
+            if (this.ambiente.encicloBreak) {
+                // se leyo un brack en el ciclo
+                break
+            }
         }
     }
 }

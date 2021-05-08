@@ -107,10 +107,22 @@ class Ambiente {
     ejecutarAmbiente() {
         for (let i = 0; i < this.listaInstrucciones.length; i++) {
             const element = this.listaInstrucciones[i];
-            if (this.estaEnCiclo == true && element instanceof SwitchSentencia_1.SentenciaBreack) {
+            //if (this.estaEnCiclo==true && element instanceof SentenciaBreack) {
+            //    element.ejecutar()
+            //    this.encicloBreak=true
+            //    break;
+            //}
+            if (element instanceof SwitchSentencia_1.SentenciaBreack) {
                 element.ejecutar();
-                this.encicloBreak = true;
-                break;
+                if (this.estaEnCiclo) {
+                    this.encicloBreak = true;
+                    break;
+                }
+                var padre = this.getPadre();
+                if (padre != null && padre.estaEnCiclo) {
+                    padre.encicloBreak = true;
+                    break;
+                }
             }
             element.ejecutar(null);
         }

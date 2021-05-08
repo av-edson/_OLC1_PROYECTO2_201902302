@@ -108,8 +108,11 @@ export class SentenciaBreack implements instruccion{
     }
     ejecutar(){
         if (this.ambiente.enciclado()==false) {
-            Grammar.listaErrores.push(new Error("Error Sintáctico","No se esperaba este brack, fuera de ambiente",this.noLinea,this.noColumna))
-            Grammar.consola+="Sentencia brack fuera de ambito en linea"+this.noLinea+" columna "+this.noColumna+"\n";
+            if (!this.ambiente.getPadre()?.estaEnCiclo) {
+                Grammar.listaErrores.push(new Error("Error Sintáctico","No se esperaba este brack, fuera de ambiente",this.noLinea,this.noColumna))
+                Grammar.consola+="Sentencia brack fuera de ambito en linea"+this.noLinea+" columna "+this.noColumna+"\n";
+            }
+            
         }
     }
     getColumn(){

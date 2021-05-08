@@ -18,6 +18,7 @@ class Ciclo_For {
         return this.noLinea;
     }
     ejecutar() {
+        this.ambiente.estaEnCiclo = true;
         if (this.inicial instanceof Declaracion_1.Declaracion) {
             this.ambiente.agregarSimbolo(this.inicial);
             this.inicial.ejecutar();
@@ -32,6 +33,10 @@ class Ciclo_For {
             // modificador
             this.actualizacion.ejecutar();
             this.condicional.ejecutar();
+            if (this.ambiente.encicloBreak) {
+                // se leyo un brack en el ciclo
+                break;
+            }
         }
     }
 }
