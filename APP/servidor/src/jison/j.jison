@@ -12,6 +12,7 @@ const elif = require("./calses/sentenciasControl/sentenciaElif") // clase ELIF
 const Switch = require("./calses/sentenciasControl/SwitchSentencia") //clase SWITCH
 const While = require("./calses/sentenciasCiclicas/while") // clase while
 const For = require("./calses/sentenciasCiclicas/cicloFor") // clase For
+const DoWhile = require("./calses/sentenciasCiclicas/dowhile") // clase DoWhile
 var err;
 var simAux;
 var ambAux =controllador.Grammar.ambienteGlobal;
@@ -81,6 +82,7 @@ var listIf = [];
 /* ciclos */
 "while"         return "while"   
 "for"           return "for";  
+"do"            return "do";
 /* datos */
 [0-9]+("."[0-9]+)\b       return 'decimal';
 [0-9]+\b                    return 'entero';
@@ -223,7 +225,8 @@ DEFAULT: default dos_puntos {ambAux=new Amb.Ambiente(ambAux,"case "+listIf.lengt
         $$.siDefault()};
 
 SENTENCIA_CICLICA: SENTENCIA_WHILE{$$=$1}
-                | SENTENCIA_FOR{$$=$1};
+                | SENTENCIA_FOR{$$=$1}
+                |SENTENCIA_DOWHILE{$$=$1;ambAux=ambAux.getPadre()};
 
 SENTENCIA_WHILE: WHILE BLOQUE_SENTENCIAS{$$=$1;ambAux=ambAux.getPadre()};
 
@@ -238,3 +241,7 @@ ENCABEZADOFOR:    FOR ASIGNACION punto_coma EXPRESION punto_coma MODIFICADOR par
         $$=new For.Ciclo_For(@1.first_line,@1.first_column,$2,$4,$6,ambAux);};
 
 FOR: for par_abre{ambAux = new Amb.Ambiente(ambAux,"Ciclo For");};
+
+SENTENCIA_DOWHILE: DO BLOQUE_SENTENCIAS while par_abre EXPRESION par_cierra punto_coma{$$=new DoWhile.doWhile(@1.first_line,@1.first_column,$5,ambAux);};
+
+DO:do {ambAux = new Amb.Ambiente(ambAux,"Ciclo Do-While");};

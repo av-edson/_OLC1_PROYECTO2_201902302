@@ -48,7 +48,7 @@ export class IfSentence implements instruccion{
             Grammar.consola+= "->Error semantico,la condicion agregada al IF no es de tipo booleano en liena "+this.noLinea+" columna "+this.noColumna+"\n";
         }
     }
-
+ 
     public agregarElse(sentenciaE:SentenciaElse){
         this.elseSentencia = sentenciaE
     }
