@@ -130,6 +130,8 @@ export class Ambiente {
         if (temporal.tipo_dato == nuevo.simbol.tipo) {
             temporal.valor = nuevo.simbol.getValor()
         }else{
+            //console.log(temporal.tipo_dato)
+            //console.log(nuevo.simbol.tipo)
             Grammar.listaErrores.push(new Error("Error semantico","Error en la asignacion",temporal.linea,temporal.columna))
             Grammar.consola+= " ->Error semantico en asignacion linea: "+temporal.linea+" columna: "+temporal.columna+"\n";
             temporal.tipo_dato = tipoDatos.error

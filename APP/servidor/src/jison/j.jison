@@ -19,6 +19,7 @@ var err;
 var simAux;
 var ambAux =controllador.Grammar.ambienteGlobal;
 var listIf = [];
+var listaParm=[];
 %}
 %lex 
 %options case-insensitive
@@ -140,6 +141,7 @@ INSTRUCCION: ASIGNACION punto_coma{ambAux.agregarSimbolo($1);ambAux.agregarInstr
             //ambAux.agregarSimbolo($1);
             |DECLARACION_METODOS {ambAux.agregarInstruccion($1);}
             |NO_IMPLEMENTADAS
+            |EXEC punto_coma{ambAux.agregarInstruccion($1);}
             |SENTENCIA_CICLICA{ambAux.agregarInstruccion($1);}
             |SENTENCIA_CONTROL {ambAux.agregarInstruccion($1);}
             |break punto_coma{ambAux.agregarInstruccion(new Switch.SentenciaBreack(@1.first_line,@1.first_column,ambAux));}
@@ -257,23 +259,25 @@ SENTENCIA_DOWHILE: DO BLOQUE_SENTENCIAS while par_abre EXPRESION par_cierra punt
 DO:do {ambAux = new Amb.Ambiente(ambAux,"Ciclo Do-While");};
 
 // ----------------------------- FUNCIONES LLAMADA ----------------------
-LLAMADA_FUNCION: FUNCION_PRINT{$$=$1;listIf=[]}
-        |LLAMADA_METODO{$$=$1;listIf=[]};
-LLAMADA_METODO: identificador par_abre PARAMETOS_LLAMADA par_cierra{$$=new Metodo.LlamarMetodo(@1.first_line,@1.first_column,ambAux,String($1));
-                        $$.agregarParametros(listIf);}
-        | identificador par_abre par_cierra {$$=new Metodo.LlamarMetodo(@1.first_line,@1.first_column,ambAux,String($1));};
-
-PARAMETOS_LLAMADA:EXPRESION coma PARAMETOS_LLAMADA{listIf.push($1)}
-        |EXPRESION{listIf.push($1);};
+LLAMADA_FUNCION: FUNCION_PRINT{$$=$1;}
+        |LLAMADA_METODO{$$=$1;listaParm=[]};
+LLAMADA_METODO: INICIOMETODO PARAMETOS_LLAMADA par_cierra{$$=new Metodo.LlamarMetodo(@1.first_line,@1.first_column,ambAux,String($1));
+                        $$.agregarParametros(listaParm);}
+        | INICIOMETODO par_cierra {$$=new Metodo.LlamarMetodo(@1.first_line,@1.first_column,ambAux,String($1));};
+INICIOMETODO: identificador par_abre {};
+PARAMETOS_LLAMADA:EXPRESION coma PARAMETOS_LLAMADA{listaParm.push($1)}
+        |EXPRESION{listaParm.push($1);};
 // ----------------------------- FUNCIONES declaraciones -----------------------
 FUNCION_PRINT: print par_abre EXPRESION par_cierra {$$ = new Funciones.PrintF(@1.first_line,@1.first_column,$3,ambAux);};
 
 DECLARACION_METODOS: METODO BLOQUE_SENTENCIAS{ambAux = ambAux.getPadre();listIf=[]};
 METODO: VOID identificador par_abre par_cierra{$$=new Metodo.Metodo(@1.first_line,@1.first_column,ambAux,String($2));}
         |VOID identificador par_abre PARAMETROS par_cierra{$$=new Metodo.Metodo(@1.first_line,@1.first_column,ambAux,String($2));$$.agregarParametros(listIf)};
-VOID: void {ambAux = new Amb.Ambiente(ambAux,"Metodo");listIf=[];};
+VOID: void {ambAux = new Amb.Ambiente(ambAux,"Metodo");};
 PARAMETROS:PARAMETRO coma PARAMETROS {listIf.push($1);}
         | PARAMETRO{listIf.push($1);};
 PARAMETRO : TIPO_DATO identificador {$$=new Metodo.Parametro($1,String($2))};
+// ---------------------- EXEC --------------------
+EXEC: func_exec LLAMADA_METODO{$$=$2};
 // ----------------------- NO IMPLEMENTADAS
 NO_IMPLEMENTADAS: continue{};

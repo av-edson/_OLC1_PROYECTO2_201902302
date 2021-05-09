@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parametro = exports.LlamarMetodo = exports.Metodo = void 0;
+const simbolos_1 = require("../../Enviroment/simbolos");
 const expresion_1 = require("./../expresiones/expresion");
 const Grammar_1 = require("../../controllers/Grammar");
 const error_1 = require("../../calses/error");
@@ -12,7 +13,7 @@ class Metodo {
         this.noLinea = noFila;
         this.ambiente = enviromento;
         this.listaParametos = [];
-        this.identificador = identificador;
+        this.identificador = identificador.toLocaleLowerCase();
     }
     getColumn() {
         return this.noColumna;
@@ -20,9 +21,9 @@ class Metodo {
     getLine() {
         return this.noLinea;
     }
-    agregarParametros(parametrosDefinicion) {
-        parametrosDefinicion.reverse();
-        parametrosDefinicion.forEach(element => {
+    agregarParametros(parametros) {
+        parametros.reverse();
+        parametros.forEach(element => {
             this.listaParametos.push(element);
         });
     }
@@ -53,7 +54,13 @@ class LlamarMetodo {
     agregarParametros(parametrosDefinicion) {
         parametrosDefinicion.reverse();
         parametrosDefinicion.forEach(element => {
-            this.listaParametos.push(element);
+            if (element instanceof expresion_1.expresion) {
+                if (element.simbol.tipo == simbolos_1.tipoDatos.booleano) {
+                    // console.log(parametrosDefinicion)
+                }
+                element.ejecutar();
+                this.listaParametos.push(element);
+            }
         });
     }
     getColumn() {
@@ -69,7 +76,6 @@ class LlamarMetodo {
             temp.entorno.ejecutarAmbiente();
         }
         else {
-            //console.log('llamada CON parametros')
             if (temp.parametos.length == this.listaParametos.length) {
                 for (let i = 0; i < this.listaParametos.length; i++) {
                     const entrada = this.listaParametos[i];

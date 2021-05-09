@@ -21,11 +21,12 @@ class expresion {
         if (tipo == tipoExpresion.identificador && valor != null) {
             if (this.ambiente != null) {
                 let variable = this.ambiente.buscarEnTabla(valor, this.noFila, this.noColumna);
-                if (variable == null) {
+                if (variable.tipo == "nulo") {
                     let padre = this.ambiente.getPadre();
+                    console.log(variable);
                     if (padre != null) {
                         variable = padre.buscarEnTabla(valor, this.noFila, this.noColumna);
-                        if (variable == null) {
+                        if (variable.tipo == "nulo") {
                             this.simbol.tipo = simbolos_1.tipoDatos.error;
                         }
                         else {

@@ -18,7 +18,7 @@ export class Metodo implements instruccion {
         this.noLinea = noFila;
         this.ambiente=enviromento;
         this.listaParametos = []
-        this.identificador=identificador
+        this.identificador=identificador.toLocaleLowerCase()
     }
 
     getColumn(){
@@ -28,9 +28,9 @@ export class Metodo implements instruccion {
         return this.noLinea 
     }
 
-    public agregarParametros(parametrosDefinicion:Array<Parametro>){
-        parametrosDefinicion.reverse()
-        parametrosDefinicion.forEach(element => {
+    public agregarParametros(parametros:Array<Parametro>){
+        parametros.reverse()
+        parametros.forEach(element => {
             this.listaParametos.push(element)
         });
     }
@@ -69,7 +69,13 @@ export class LlamarMetodo implements instruccion{
     public agregarParametros(parametrosDefinicion:Array<expresion>){
         parametrosDefinicion.reverse()
         parametrosDefinicion.forEach(element => {
-            this.listaParametos.push(element)
+            if (element instanceof expresion) {
+                if (element.simbol.tipo==tipoDatos.booleano) {
+                   // console.log(parametrosDefinicion)
+                }
+                element.ejecutar()
+                this.listaParametos.push(element)
+            }
         });
     }
     getColumn(){
@@ -84,7 +90,6 @@ export class LlamarMetodo implements instruccion{
             //console.log('llamada sin parametros')
             temp.entorno.ejecutarAmbiente()
         } else{ 
-            //console.log('llamada CON parametros')
             if (temp.parametos.length == this.listaParametos.length) {
                 for (let i = 0; i < this.listaParametos.length; i++) {
                     const entrada = this.listaParametos[i];

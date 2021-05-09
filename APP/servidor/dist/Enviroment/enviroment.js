@@ -117,6 +117,8 @@ class Ambiente {
             temporal.valor = nuevo.simbol.getValor();
         }
         else {
+            //console.log(temporal.tipo_dato)
+            //console.log(nuevo.simbol.tipo)
             Grammar_1.Grammar.listaErrores.push(new error_1.Error("Error semantico", "Error en la asignacion", temporal.linea, temporal.columna));
             Grammar_1.Grammar.consola += " ->Error semantico en asignacion linea: " + temporal.linea + " columna: " + temporal.columna + "\n";
             temporal.tipo_dato = simbolos_1.tipoDatos.error;
