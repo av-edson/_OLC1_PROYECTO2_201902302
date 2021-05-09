@@ -42,7 +42,7 @@ export class Metodo implements instruccion {
                     var decla = new Declaracion(tipoExpresion.identificador,this.getLine(),this.getColumn(),element.simbolo.tipo,element.simbolo.valor,this.ambiente,element.identificador,null)
                     this.ambiente.agregarSimbolo(decla)
                 }
-            });
+            }); 
         }
 
         var padre = this.ambiente.getPadre()
@@ -70,13 +70,19 @@ export class LlamarMetodo implements instruccion{
         parametrosDefinicion.reverse()
         parametrosDefinicion.forEach(element => {
             if (element instanceof expresion) {
-                if (element.simbol.tipo==tipoDatos.booleano) {
-                   // console.log(parametrosDefinicion)
+                if (element.tipo==tipoExpresion.identificador) {
+                    var variable:Nodo = this.padre.buscarEnTabla(element.simbol.valor,element.noFila,element.noColumna)
+                    if (variable.tipo!="nulo") {
+                        var simAux = new simbolo(variable.tipo_dato,variable.valor)
+                    }else{ 
+                        var simAux = new simbolo(tipoDatos.nulo,'')
+                    }
+                    element.simbol = simAux
                 }
-                element.ejecutar()
                 this.listaParametos.push(element)
             }
         });
+        //console.log(this.listaParametos)
     }
     getColumn(){
         return this.noColumna
@@ -93,6 +99,10 @@ export class LlamarMetodo implements instruccion{
             if (temp.parametos.length == this.listaParametos.length) {
                 for (let i = 0; i < this.listaParametos.length; i++) {
                     const entrada = this.listaParametos[i];
+                    //if (entrada.simbol.tipo == tipoDatos.nulo) {
+                    //    console.log(this.padre.getNombreAmbiente())
+                    //    console.log(entrada)
+                    //}
                     entrada.ambiente =temp.entorno
                     const dentroMetodo = temp.parametos[i];
                     var cambio = new Asignacion(this.getLine(),this.getColumn(),entrada,dentroMetodo.identificador)

@@ -32,13 +32,11 @@ export class expresion implements instruccion{
         if (tipo==tipoExpresion.identificador && valor != null) {
             if (this.ambiente != null) {
                 let variable:Nodo = this.ambiente.buscarEnTabla(valor,this.noFila,this.noColumna);
-                if (variable.tipo=="nulo") {
+                if (variable==null) {
                     let padre = this.ambiente.getPadre()
-                    console.log(variable)
                     if (padre!=null) {
                         variable = padre.buscarEnTabla(valor,this.noFila,this.noColumna)
-                        
-                        if (variable.tipo=="nulo") {
+                        if (variable==null) {
                             this.simbol.tipo = tipoDatos.error
                         }else{
                             this.setTipoSimbolo(variable,this.simbol.getValor())
@@ -80,6 +78,7 @@ export class expresion implements instruccion{
         }
     }
     
+
     ejecutar(){ 
         let simboloDerecho ;
         let simboloIzquierdo;

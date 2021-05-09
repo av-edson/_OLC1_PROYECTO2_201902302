@@ -55,13 +55,20 @@ class LlamarMetodo {
         parametrosDefinicion.reverse();
         parametrosDefinicion.forEach(element => {
             if (element instanceof expresion_1.expresion) {
-                if (element.simbol.tipo == simbolos_1.tipoDatos.booleano) {
-                    // console.log(parametrosDefinicion)
+                if (element.tipo == expresion_1.tipoExpresion.identificador) {
+                    var variable = this.padre.buscarEnTabla(element.simbol.valor, element.noFila, element.noColumna);
+                    if (variable.tipo != "nulo") {
+                        var simAux = new simbolos_1.simbolo(variable.tipo_dato, variable.valor);
+                    }
+                    else {
+                        var simAux = new simbolos_1.simbolo(simbolos_1.tipoDatos.nulo, '');
+                    }
+                    element.simbol = simAux;
                 }
-                element.ejecutar();
                 this.listaParametos.push(element);
             }
         });
+        //console.log(this.listaParametos)
     }
     getColumn() {
         return this.noColumna;
@@ -79,6 +86,10 @@ class LlamarMetodo {
             if (temp.parametos.length == this.listaParametos.length) {
                 for (let i = 0; i < this.listaParametos.length; i++) {
                     const entrada = this.listaParametos[i];
+                    //if (entrada.simbol.tipo == tipoDatos.nulo) {
+                    //    console.log(this.padre.getNombreAmbiente())
+                    //    console.log(entrada)
+                    //}
                     entrada.ambiente = temp.entorno;
                     const dentroMetodo = temp.parametos[i];
                     var cambio = new asignacion_1.Asignacion(this.getLine(), this.getColumn(), entrada, dentroMetodo.identificador);

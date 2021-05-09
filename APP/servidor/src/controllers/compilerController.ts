@@ -6,22 +6,21 @@ import { instruccion } from "../Enviroment/instruccion";
 export const compilarEntrada = (req:Request, res:Response) => {
     try {
         const conteido = req.body.code;
+        Grammar.num=1;
         Grammar.consola = "";
         Grammar.listaErrores = [];
         Grammar.ambienteGlobal.limpiarListas()
-        
+        Grammar.ast.hijos = []
         const parser = require('../j.js')
         
         parser.parse(conteido)
-        //console.log("---------------------")
-        //console.log(Grammar.ambienteGlobal.getListaInstrucciones())
-        //console.log("---------------------")
-        //console.log(Grammar.ambienteGlobal)
         Grammar.ambienteGlobal.ejecutarAmbiente()
+        console.log(Grammar.ast)
+        
         res.json({
             mensaje: Grammar.consola,
             errores: Grammar.listaErrores,
-            simbolos:Grammar.ambienteGlobal.getTablaSimbolos2()
+            simbolos:Grammar.ambienteGlobal.getTablaSimbolos2(),
         })
     } catch (error) {
         console.log(error)
@@ -32,5 +31,4 @@ export const compilarEntrada = (req:Request, res:Response) => {
         })
     }
 }
-
 

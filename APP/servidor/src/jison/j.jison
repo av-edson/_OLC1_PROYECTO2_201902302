@@ -15,9 +15,12 @@ const For = require("./calses/sentenciasCiclicas/cicloFor") // clase For
 const DoWhile = require("./calses/sentenciasCiclicas/dowhile") // clase DoWhile
 const Funciones = require("./calses/Funciones/Funciones") // clase Funciones
 const Metodo = require("./calses/Funciones/Metodos") // clase Metodo
+const ast = require("./calses/arbol/ast") // clase arbol
 var err;
 var simAux;
 var ambAux =controllador.Grammar.ambienteGlobal;
+var arr = controllador.Grammar.ast;
+var aux;
 var listIf = [];
 var listaParm=[];
 %}
@@ -85,7 +88,7 @@ var listaParm=[];
 "break"         return 'break';
 "default"       return 'default'; 
 /* ciclos */
-"while"         return "while"   
+"while"         return "while";   
 "for"           return "for";  
 "do"            return "do";
 /* funciones */
@@ -98,7 +101,7 @@ var listaParm=[];
 "'"([^']*)"'"         return 'caracter';
 "true"          return 'verdadero';
 "false"         return 'falso';
-([a-z]|[A-Z])+([a-z]|[0-9]|"_")*\b return 'identificador'
+([a-z]|[A-Z])+([a-z]|[0-9]|"_")*\b return 'identificador';
 
 
 <<EOF>>     return 'EOF';
@@ -180,17 +183,17 @@ EXPRESION: resta EXPRESION %prec UNMENOS {$$ = new E.expresion(null,$2,E.tipoExp
             |EXPRESION pregunta_cierra EXPRESION dos_puntos EXPRESION {$$ = new E.expresion($5,$3,E.tipoExpresion.ternario,@2.first_line,@2.first_column,null,null,$1,null,ambAux);}
             |EXPRESION incremento {$$ = new E.expresion(null,$1,E.tipoExpresion.incremento,@2.first_line,@2.first_column,null,null,null,null,ambAux);}
             |EXPRESION decremento{$$ = new E.expresion(null,$1,E.tipoExpresion.decremento,@2.first_line,@2.first_column,null,null,null,null,ambAux);}
-            |DATO {$$=$1 };     
+            |DATO {$$=$1;};     
 
 
 
-DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,@1.first_line,@1.first_column,S.tipoDatos.decimal,String($1),null,null,ambAux);}
-        |entero    {$$ = new E.expresion(null,null,E.tipoExpresion.numero,@1.first_line,@1.first_column,S.tipoDatos.entero,String($1),null,null,ambAux);}
-        |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,@1.first_line,@1.first_column,S.tipoDatos.booleano,String($1),null,null,ambAux);}
-        |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,@1.first_line,@1.first_column,S.tipoDatos.booleano,String($1),null,null,ambAux);}
-        |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,@1.first_line,@1.first_column,S.tipoDatos.cadena,String($1).slice(1,-1),null,null,ambAux);}
-        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,@1.first_line,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1),null,null,ambAux);}
-        |identificador{$$=new E.expresion(null,null,E.tipoExpresion.identificador,@1.first_line,@1.first_column,null,String($1),null,null,ambAux)};
+DATO: decimal   {$$ = new E.expresion(null,null,E.tipoExpresion.numero,@1.first_line,@1.first_column,S.tipoDatos.decimal,String($1),null,null,ambAux);arr.agregarHijo(new ast.arbol(String($1))) }
+        |entero    {$$ = new E.expresion(null,null,E.tipoExpresion.numero,@1.first_line,@1.first_column,S.tipoDatos.entero,String($1),null,null,ambAux);arr.agregarHijo(new ast.arbol(String($1))) }
+        |verdadero {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,@1.first_line,@1.first_column,S.tipoDatos.booleano,String($1),null,null,ambAux); arr.agregarHijo(new ast.arbol(String($1)))}
+        |falso {$$ = new E.expresion(null,null,E.tipoExpresion.booleano,@1.first_line,@1.first_column,S.tipoDatos.booleano,String($1),null,null,ambAux);arr.agregarHijo(new ast.arbol(String($1))) }
+        |cadena {$$ = new E.expresion(null,null,E.tipoExpresion.cadena,@1.first_line,@1.first_column,S.tipoDatos.cadena,String($1).slice(1,-1),null,null,ambAux); arr.agregarHijo(new ast.arbol(String($1)))}
+        |caracter {$$ = new E.expresion(null,null,E.tipoExpresion.caracter,@1.first_line,@1.first_column,S.tipoDatos.caracter,String($1).slice(1,-1),null,null,ambAux);arr.agregarHijo(new ast.arbol(String($1))) }
+        |identificador{$$=new E.expresion(null,null,E.tipoExpresion.identificador,@1.first_line,@1.first_column,null,String($1),null,null,ambAux);arr.agregarHijo(new ast.arbol(String($1))) };
 
 TIPO_DATO: def_entero {$$ = new S.simbolo(S.tipoDatos.entero,null);}
             |def_decimal{$$ = new S.simbolo(S.tipoDatos.decimal,null);}
@@ -271,8 +274,10 @@ PARAMETOS_LLAMADA:EXPRESION coma PARAMETOS_LLAMADA{listaParm.push($1)}
 FUNCION_PRINT: print par_abre EXPRESION par_cierra {$$ = new Funciones.PrintF(@1.first_line,@1.first_column,$3,ambAux);};
 
 DECLARACION_METODOS: METODO BLOQUE_SENTENCIAS{ambAux = ambAux.getPadre();listIf=[]};
-METODO: VOID identificador par_abre par_cierra{$$=new Metodo.Metodo(@1.first_line,@1.first_column,ambAux,String($2));}
-        |VOID identificador par_abre PARAMETROS par_cierra{$$=new Metodo.Metodo(@1.first_line,@1.first_column,ambAux,String($2));$$.agregarParametros(listIf)};
+METODO: VOID identificador par_abre par_cierra{$$=new Metodo.Metodo(@1.first_line,@1.first_column,ambAux,String($2));
+                ambAux.setNombreAmbiente(String($2));}
+        |VOID identificador par_abre PARAMETROS par_cierra{$$=new Metodo.Metodo(@1.first_line,@1.first_column,ambAux,String($2));$$.agregarParametros(listIf);
+                ambAux.setNombreAmbiente(String($2));};
 VOID: void {ambAux = new Amb.Ambiente(ambAux,"Metodo");};
 PARAMETROS:PARAMETRO coma PARAMETROS {listIf.push($1);}
         | PARAMETRO{listIf.push($1);};

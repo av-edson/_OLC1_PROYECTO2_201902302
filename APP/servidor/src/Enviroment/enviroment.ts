@@ -5,8 +5,15 @@ import { Grammar } from "../controllers/Grammar";
 import { simbolo, tipoDatos } from "./simbolos";
 import {tablaSimbolosModel} from "../models/tabla-simbolos"
 import { instruccion } from "./instruccion";
-import { SentenciaBreack } from "../calses/sentenciasControl/SwitchSentencia";
+import { SentenciaBreack, SentenciaSwitch } from "../calses/sentenciasControl/SwitchSentencia";
 import { LlamarMetodo, Metodo, Parametro } from "../calses/Funciones/Metodos";
+import { Asignacion } from "../calses/manejoVariables/asignacion";
+import { PrintF } from "../calses/Funciones/Funciones";
+import { Ciclo_For } from "../calses/sentenciasCiclicas/cicloFor";
+import { doWhile } from "../calses/sentenciasCiclicas/dowhile";
+import { WhileSentencia } from "../calses/sentenciasCiclicas/while";
+import { IfSentence } from "../calses/sentenciasControl/sentenciaIF";
+import { Elif } from "../calses/sentenciasControl/sentenciaElif";
 export class Ambiente {
     public tablaSimbolos:Array<Nodo>;
     public tablaSimbolos2:Array<Nodo>;
@@ -25,6 +32,12 @@ export class Ambiente {
         this.tablaSimbolos2 = []
     }
  
+    getJson():string{
+        var res:string=""
+        res = JSON.stringify(this.listaInstrucciones)
+        return res;
+    }
+
     public limpiarListas(){
         this.tablaSimbolos = []
         this.listaInstrucciones = []
@@ -105,7 +118,7 @@ export class Ambiente {
                     break  
                 }
             }
-            aux = aux.ambientePadre;
+            aux = aux.getPadre();
         }
         return new Nodo(tipoExpresion.nulo,fila,columna,new simbolo(tipoDatos.nulo,null),this,nombre);
     }
@@ -130,8 +143,6 @@ export class Ambiente {
         if (temporal.tipo_dato == nuevo.simbol.tipo) {
             temporal.valor = nuevo.simbol.getValor()
         }else{
-            //console.log(temporal.tipo_dato)
-            //console.log(nuevo.simbol.tipo)
             Grammar.listaErrores.push(new Error("Error semantico","Error en la asignacion",temporal.linea,temporal.columna))
             Grammar.consola+= " ->Error semantico en asignacion linea: "+temporal.linea+" columna: "+temporal.columna+"\n";
             temporal.tipo_dato = tipoDatos.error
@@ -169,6 +180,10 @@ export class Ambiente {
             salida.push(aux)
         });
         return salida;
+    }
+
+    public setNombreAmbiente(ide:string){
+        this.nombreAmbiente+=ide;
     }
  
     public ejecutarAmbiente(){

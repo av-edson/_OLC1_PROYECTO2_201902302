@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Declaracion = void 0;
 const simbolos_1 = require("../../Enviroment/simbolos");
+const expresion_1 = require("../expresiones/expresion");
 const Grammar_1 = require("../../controllers/Grammar");
 const error_1 = require("../error");
 class Declaracion {
@@ -23,7 +24,20 @@ class Declaracion {
         else {
             return;
         }
-        if (this.expresionDef != null && this.tipoDato == this.expresionDef.simbol.tipo) {
+        if (this.expresionDef != null && this.expresionDef.tipo == expresion_1.tipoExpresion.identificador) {
+            var variable = this.entorno.buscarEnTabla(this.identificador, this.fila, this.columna);
+            var nueva = this.entorno.buscarEnTabla(variable.valor, variable.linea, variable.columna);
+            if (nueva.tipo_dato == variable.tipo_dato) {
+                this.valor = nueva.valor;
+                this.expresionDef.simbol = new simbolos_1.simbolo(this.tipoDato, this.valor);
+                this.expresionDef.ambiente.editarSimbolo(this.identificador, this.fila, this.columna, this.expresionDef);
+            }
+            else {
+                this.tipoDato = simbolos_1.tipoDatos.error;
+                this.expresionDef.ambiente.editarSimbolo(this.identificador, this.fila, this.columna, this.expresionDef);
+            }
+        }
+        else if (this.expresionDef != null && this.tipoDato == this.expresionDef.simbol.tipo) {
             this.valor = this.expresionDef.simbol.getValor();
             this.expresionDef.ambiente.editarSimbolo(this.identificador, this.fila, this.columna, this.expresionDef);
         }

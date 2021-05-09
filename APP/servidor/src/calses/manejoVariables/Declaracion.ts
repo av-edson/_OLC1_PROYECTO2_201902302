@@ -29,8 +29,19 @@ export class Declaracion implements instruccion{
             this.expresionDef?.ejecutar()
         }else{
             return
+        }if(this.expresionDef!= null && this.expresionDef.tipo == tipoExpresion.identificador){
+            var variable = this.entorno.buscarEnTabla(this.identificador,this.fila,this.columna)
+            var nueva = this.entorno.buscarEnTabla(variable.valor,variable.linea,variable.columna)
+            if (nueva.tipo_dato == variable.tipo_dato) {
+                this.valor=nueva.valor 
+                this.expresionDef.simbol = new simbolo(this.tipoDato,this.valor)
+                this.expresionDef.ambiente.editarSimbolo(this.identificador,this.fila,this.columna,this.expresionDef)
+            }else{
+                this.tipoDato=tipoDatos.error;
+                this.expresionDef.ambiente.editarSimbolo(this.identificador,this.fila,this.columna,this.expresionDef)
+            }
         }
-        if (this.expresionDef != null && this.tipoDato==this.expresionDef.simbol.tipo) {
+        else if (this.expresionDef != null && this.tipoDato==this.expresionDef.simbol.tipo) {
             this.valor = this.expresionDef.simbol.getValor()
             this.expresionDef.ambiente.editarSimbolo(this.identificador,this.fila,this.columna,this.expresionDef)
         }else if(this.tipoDato==tipoDatos.decimal && this.expresionDef?.simbol.tipo==tipoDatos.entero ){

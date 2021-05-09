@@ -18,6 +18,11 @@ class Ambiente {
         this.encicloBreak = false;
         this.tablaSimbolos2 = [];
     }
+    getJson() {
+        var res = "";
+        res = JSON.stringify(this.listaInstrucciones);
+        return res;
+    }
     limpiarListas() {
         this.tablaSimbolos = [];
         this.listaInstrucciones = [];
@@ -92,7 +97,7 @@ class Ambiente {
                     break;
                 }
             }
-            aux = aux.ambientePadre;
+            aux = aux.getPadre();
         }
         return new Nodo(expresion_1.tipoExpresion.nulo, fila, columna, new simbolos_1.simbolo(simbolos_1.tipoDatos.nulo, null), this, nombre);
     }
@@ -117,8 +122,6 @@ class Ambiente {
             temporal.valor = nuevo.simbol.getValor();
         }
         else {
-            //console.log(temporal.tipo_dato)
-            //console.log(nuevo.simbol.tipo)
             Grammar_1.Grammar.listaErrores.push(new error_1.Error("Error semantico", "Error en la asignacion", temporal.linea, temporal.columna));
             Grammar_1.Grammar.consola += " ->Error semantico en asignacion linea: " + temporal.linea + " columna: " + temporal.columna + "\n";
             temporal.tipo_dato = simbolos_1.tipoDatos.error;
@@ -155,6 +158,9 @@ class Ambiente {
             salida.push(aux);
         });
         return salida;
+    }
+    setNombreAmbiente(ide) {
+        this.nombreAmbiente += ide;
     }
     ejecutarAmbiente() {
         for (let i = 0; i < this.listaInstrucciones.length; i++) {
